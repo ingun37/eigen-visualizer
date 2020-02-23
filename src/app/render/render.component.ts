@@ -1,5 +1,9 @@
 import { Component, OnInit, ElementRef } from '@angular/core';
 import * as THREE from 'three';
+import { Store, select } from '@ngrx/store';
+import { State, selectThreeMatrix } from '../reducers';
+import { Matrix4 } from 'three';
+import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-render',
@@ -12,30 +16,17 @@ export class RenderComponent implements OnInit {
   renderer: THREE.WebGLRenderer
   camera: THREE.PerspectiveCamera
   constructor(
-    public ref:ElementRef
+    public ref:ElementRef,
+    private store: Store<State>
   ) { 
     this.scene = new THREE.Scene();
     this.renderer = new THREE.WebGLRenderer();
     this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+    
   }
 
   lastCube:THREE.Object3D
-  updateGeo(): void {
-    if (this.lastCube) {
-      this.scene.remove(this.lastCube)
-    }
-    this.lastCube = makeCube()
-    let m = new THREE.Matrix4()
-    m.set(1,0,0,0,
-          0,1,0,0,
-          0,0,1,0,
-          0,0,0,1)
-    // this.lastCube.matrix = m
-    this.lastCube.applyMatrix4(m)
-    this.scene.add( this.lastCube)
-    this.scene.remove()
-    this.renderer.render( this.scene, this.camera );
-  }
+  
   ngOnInit(): void {
     this.scene.background = new THREE.Color(1,1,1)
     this.renderer.setSize( 512, 512 );
@@ -49,7 +40,17 @@ export class RenderComponent implements OnInit {
     this.scene.add( makeAxis(0,100,0, 0x00ff00) );
     this.scene.add( makeAxis(0,0,100, 0x0000ff) );
     this.scene.add( makeAxis(100,0,0, 0xff0000) );
-    this.updateGeo()
+
+    this.store.pipe(select(selectThreeMatrix)).subscribe(matrix=>{
+      if (this.lastCube) {
+        this.scene.remove(this.lastCube)
+      }
+      this.lastCube = makeCube()
+      this.lastCube.applyMatrix4(matrix)
+      this.scene.add( this.lastCube)
+      this.scene.remove()
+      this.renderer.render( this.scene, this.camera );
+    })
   }
 
 }
