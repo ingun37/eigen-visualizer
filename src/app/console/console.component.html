@@ -1,8 +1,7 @@
 <p>
     determinant: {{determinant | async}} <br>
-    
-</p>
-eigenvalue / eigenvector
-<p *ngFor="let eigen of eigens | async" [ngStyle]="{'color': eigen.color}">
-    {{eigen.value}} / {{eigen.vector}}
+    eigenvalue / eigenvector <br>
+    <span *ngFor="let eigen of eigens | async" [ngStyle]="{'color': eigen.color}">
+        {{eigen.value}} / {{eigen.vector}} <br>
+    </span>
 </p>
