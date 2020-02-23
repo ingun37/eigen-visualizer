@@ -2,7 +2,7 @@ import { Component, OnInit, ElementRef } from '@angular/core';
 import * as THREE from 'three';
 import { Store, select } from '@ngrx/store';
 import { State, selectThreeMatrix, selectEverything } from '../reducers';
-import { Matrix4, Mesh, Geometry, LineSegments, Vector3, CylinderGeometry, Object3D } from 'three';
+import { Matrix4, Mesh, Geometry, LineSegments, Vector3, CylinderGeometry, Object3D, ConeGeometry, MeshBasicMaterial, Quaternion, Group } from 'three';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -58,16 +58,17 @@ export class RenderComponent implements OnInit {
       cubeframe.name = "cubeframe"
       this.scene.add( cubeframe)
 
-      // let aaa = [0,1,2]
-      // let colors = [0xc0c000, 0x00c0c0, 0xc000c0]
-      // let name = "eigenvector"
+      let aaa = [0,1,2]
+      let colors = [0xc0c000, 0x00c0c0, 0xc000c0]//matches with console eigen font colors
+      this.removeObjectsWithName("eigenvector")
 
-      // aaa.forEach(i=>{
-      //   let col = eigen.eigenvectorMatrix.getColumn(i)
-      //   let v = makeVector(col[0], col[1], col[2], colors[i])
-      //   v.name = name
-      //   this.scene.add()
-      // })
+      let eigens = aaa.map(i=>{
+        let col = eigen.eigenvectorMatrix.getColumn(i)
+        let v = makeVector(col[0], col[1], col[2], colors[i])
+        v.name = "eigenvector"
+        return v
+      })
+      this.scene.add(...eigens)
       this.renderer.render( this.scene, this.camera );
     })
   }
@@ -90,14 +91,23 @@ function makeAxis(x:number, y:number, z:number, color:number):THREE.Object3D {
   return line
 }
 
-function makeVector(x:number, y:number, z:number, color:number):THREE.Line {
-  var material = new THREE.LineBasicMaterial( { color: color, linewidth: 3.5 } );
-  var points = [];
-  points.push( new THREE.Vector3( 0, 0, 0 ) );
-  points.push( new THREE.Vector3( x, y, z ) );
-  var geometry = new THREE.BufferGeometry().setFromPoints( points );
-  var line = new THREE.Line( geometry, material );
-  return line
+function makeVector(x:number, y:number, z:number, color:number):THREE.Object3D {
+  
+  let coneGeo = new ConeGeometry(0.15, 0.3)
+  let coneMat = new MeshBasicMaterial({ color: color })
+  let cone = new Mesh(coneGeo, coneMat).translateY(2)
+  
+  var linemat = new THREE.LineBasicMaterial( { color: color, linewidth: 3.5 } );
+  var lineGeometry = new THREE.BufferGeometry().setFromPoints( [new Vector3(0,0,0), new Vector3(0,2,0)] );
+  var line = new THREE.Line( lineGeometry, linemat );
+
+  let group = new Group()
+  group.add(cone, line)
+  let q = new Quaternion()
+  q.setFromUnitVectors(new Vector3(0,1,0), new Vector3(x,y,z).normalize())
+  group.setRotationFromQuaternion(q)
+  group.renderOrder = 500
+  return group
 }
 
 function makeCube():THREE.Mesh {
