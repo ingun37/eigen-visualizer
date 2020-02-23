@@ -8,32 +8,41 @@ import * as THREE from 'three';
 })
 export class RenderComponent implements OnInit {
 
+  scene:THREE.Scene
+  renderer: THREE.WebGLRenderer
+  camera: THREE.PerspectiveCamera
   constructor(
     public ref:ElementRef
-  ) { }
+  ) { 
+    this.scene = new THREE.Scene();
+    this.renderer = new THREE.WebGLRenderer();
+    this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+  }
 
+  lastCube:THREE.Object3D
+  updateGeo(): void {
+    if (this.lastCube) {
+      this.scene.remove(this.lastCube)
+    }
+    this.lastCube = makeCube()
+    this.scene.add( this.lastCube)
+    this.scene.remove()
+    this.renderer.render( this.scene, this.camera );
+  }
   ngOnInit(): void {
-    var scene = new THREE.Scene();
-    var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+    this.scene.background = new THREE.Color(1,1,1)
+    this.renderer.setSize( 512, 512 );
+    this.ref.nativeElement.appendChild( this.renderer.domElement );
 
-    scene.background = new THREE.Color(1,1,1)
-    var renderer = new THREE.WebGLRenderer();
-    renderer.setSize( 512, 512 );
+    this.camera.position.z = 5;
+    this.camera.position.y = 2
+    this.camera.position.x = 2
+    this.camera.lookAt(0,0,0)
 
-    this.ref.nativeElement.appendChild( renderer.domElement );
-
-    scene.add( makeAxis(0,100,0, 0x00ff00) );
-    scene.add( makeAxis(0,0,100, 0x0000ff) );
-    scene.add( makeAxis(100,0,0, 0xff0000) );
-    scene.add( makeCube())
-
-    camera.position.z = 5;
-    camera.position.y = 2
-    camera.position.x = 2
-    camera.lookAt(0,0,0)
-
-    renderer.render( scene, camera );
-    
+    this.scene.add( makeAxis(0,100,0, 0x00ff00) );
+    this.scene.add( makeAxis(0,0,100, 0x0000ff) );
+    this.scene.add( makeAxis(100,0,0, 0xff0000) );
+    this.updateGeo()
   }
 
 }
