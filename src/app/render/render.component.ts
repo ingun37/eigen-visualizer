@@ -18,7 +18,18 @@ export class RenderComponent implements OnInit {
 
     var renderer = new THREE.WebGLRenderer();
     renderer.setSize( 512, 512 );
+
     this.ref.nativeElement.appendChild( renderer.domElement );
+
+    var geometry = new THREE.BoxGeometry();
+    var material = new THREE.MeshBasicMaterial( { color: 0x00ff00 } );
+    var cube = new THREE.Mesh( geometry, material );
+    scene.add( cube );
+
+    camera.position.z = 5;
+
+    renderer.render( scene, camera );
+    
   }
 
 }
