@@ -30,7 +30,7 @@ export class ConsoleComponent implements OnInit {
       map(eigen=> {
         let colors = ["#ff0000", "#00ff00", "#0000ff"]
         return [0,1,2].map(i=>{
-          return new ShowEigen(colors[i],"0", "1,1,1")
+          return new ShowEigen(colors[i],eigen.diagonalMatrix.get(i,i).toString(), eigen.eigenvectorMatrix.getColumn(i).map(x=>x.toString()).join(", "))
         })
       })
     )
