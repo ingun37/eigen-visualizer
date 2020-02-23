@@ -28,7 +28,7 @@ export class ConsoleComponent implements OnInit {
 
     this.eigens = this.store.pipe(select(selectEigen)).pipe(
       map(eigen=> {
-        let colors = ["#ff0000", "#00ff00", "#0000ff"]
+        let colors = ["#c0c000", "#00c0c0", "#c000c0"]
         return [0,1,2].map(i=>{
           return new ShowEigen(colors[i],eigen.diagonalMatrix.get(i,i).toString(), eigen.eigenvectorMatrix.getColumn(i).map(x=>x.toString()).join(", "))
         })
