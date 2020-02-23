@@ -1,8 +1,8 @@
 import { Component, OnInit, ElementRef } from '@angular/core';
 import * as THREE from 'three';
 import { Store, select } from '@ngrx/store';
-import { State, selectThreeMatrix } from '../reducers';
-import { Matrix4, Mesh, Geometry, LineSegments, Vector3 } from 'three';
+import { State, selectThreeMatrix, selectEverything } from '../reducers';
+import { Matrix4, Mesh, Geometry, LineSegments, Vector3, CylinderGeometry, Object3D } from 'three';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -25,8 +25,6 @@ export class RenderComponent implements OnInit {
     
   }
 
-  lastCube:THREE.Object3D
-  lastCubeFrame:THREE.LineSegments
   ngOnInit(): void {
     this.scene.background = new THREE.Color(1,1,1)
     this.renderer.setSize( 512, 512 );
@@ -44,31 +42,56 @@ export class RenderComponent implements OnInit {
     this.scene.add( makeAxis(100,0,0, 0xff0000) );
     this.scene.add( makeAxis(0,0,100, 0x0000ff) );
 
-    this.store.pipe(select(selectThreeMatrix)).subscribe(matrix=>{
-      if (this.lastCube) {
-        this.scene.remove(this.lastCube)
-      }
-      if (this.lastCubeFrame) {
-        this.scene.remove(this.lastCubeFrame)
-      }
-      this.lastCube = makeCube()
-      this.lastCube.applyMatrix4(matrix)
-      this.scene.add( this.lastCube)
+    this.store.pipe(select(selectEverything)).subscribe(everything=>{
+      let matrix = everything.matrix
+      let eigen = everything.ei
+      this.removeObjectsWithName("cube")
+      this.removeObjectsWithName("cubeframe")
+      
+      let cube = makeCube()
+      cube.applyMatrix4(matrix)
+      cube.name = "cube"
+      this.scene.add( cube)
 
-      this.lastCubeFrame = makeCubeFrame()
-      this.lastCubeFrame.applyMatrix4(matrix)
-      this.scene.add( this.lastCubeFrame)
+      let cubeframe = makeCubeFrame()
+      cubeframe.applyMatrix4(matrix)
+      cubeframe.name = "cubeframe"
+      this.scene.add( cubeframe)
 
+      // let aaa = [0,1,2]
+      // let colors = [0xc0c000, 0x00c0c0, 0xc000c0]
+      // let name = "eigenvector"
+
+      // aaa.forEach(i=>{
+      //   let col = eigen.eigenvectorMatrix.getColumn(i)
+      //   let v = makeVector(col[0], col[1], col[2], colors[i])
+      //   v.name = name
+      //   this.scene.add()
+      // })
       this.renderer.render( this.scene, this.camera );
     })
-
-    
   }
-
+  removeObjectsWithName(name:string) {
+    let o = this.scene.getObjectByName(name)
+    if (o) {
+      this.scene.remove(o)
+      this.removeObjectsWithName(name)
+    }
+  }
 }
 
-function makeAxis(x:number, y:number, z:number, color:number):THREE.Line {
+function makeAxis(x:number, y:number, z:number, color:number):THREE.Object3D {
   var material = new THREE.LineBasicMaterial( { color: color, linewidth: 2 } );
+  var points = [];
+  points.push( new THREE.Vector3( 0, 0, 0 ) );
+  points.push( new THREE.Vector3( x, y, z ) );
+  var geometry = new THREE.BufferGeometry().setFromPoints( points );
+  var line = new THREE.Line( geometry, material );
+  return line
+}
+
+function makeVector(x:number, y:number, z:number, color:number):THREE.Line {
+  var material = new THREE.LineBasicMaterial( { color: color, linewidth: 3.5 } );
   var points = [];
   points.push( new THREE.Vector3( 0, 0, 0 ) );
   points.push( new THREE.Vector3( x, y, z ) );
