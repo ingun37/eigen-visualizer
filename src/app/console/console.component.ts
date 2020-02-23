@@ -17,18 +17,31 @@ export class ConsoleComponent implements OnInit {
   ) { }
 
   determinant: Observable<string>
-  reals: Observable<string>
+  eigens: Observable<ShowEigen[]>
+
   ngOnInit(): void {
     this.determinant = this.store.pipe(select(selectDeterminant)).pipe(
       map(det=>{
         return `determinant: ${det}`
       })
     )
-    this.reals = this.store.pipe(select(selectEigen)).pipe(
-      map(eigen=>{
-        return eigen.realEigenvalues.map(x=>x.toString()).join(", ")
+
+    this.eigens = this.store.pipe(select(selectEigen)).pipe(
+      map(eigen=> {
+        let colors = ["#ff0000", "#00ff00", "#0000ff"]
+        return [0,1,2].map(i=>{
+          return new ShowEigen(colors[i],"0", "1,1,1")
+        })
       })
     )
   }
 
+}
+
+class ShowEigen {
+  constructor(
+    public color: string,
+    public value:string,
+    public vector:string
+  ) {}
 }

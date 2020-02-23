@@ -1,4 +1,8 @@
 <p>
     {{determinant | async}} <br>
-    real eigen values: {{reals | async}}
+    
+</p>
+
+<p *ngFor="let eigen of eigens | async" [ngStyle]="{'color': eigen.color}">
+    {{eigen.value}} {{eigen.vector}}
 </p>
