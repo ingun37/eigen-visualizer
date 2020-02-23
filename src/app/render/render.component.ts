@@ -37,10 +37,13 @@ export class RenderComponent implements OnInit {
     this.camera.position.x = 2
     this.camera.lookAt(0,0,0)
 
-    this.scene.add( makeAxis(0,100,0, 0x00ff00) );
-    // this.scene.add( makeAxis(0,0,100, 0x0000ff) );
-    // this.scene.add( makeAxis(100,0,0, 0xff0000) );
+    
     this.scene.add (makeGrid())
+
+    this.scene.add( makeAxis(0,100,0, 0x00ff00) );
+    this.scene.add( makeAxis(100,0,0, 0xff0000) );
+    this.scene.add( makeAxis(0,0,100, 0x0000ff) );
+
     this.store.pipe(select(selectThreeMatrix)).subscribe(matrix=>{
       if (this.lastCube) {
         this.scene.remove(this.lastCube)
@@ -51,12 +54,14 @@ export class RenderComponent implements OnInit {
       this.scene.remove()
       this.renderer.render( this.scene, this.camera );
     })
+
+    
   }
 
 }
 
 function makeAxis(x:number, y:number, z:number, color:number):THREE.Line {
-  var material = new THREE.LineBasicMaterial( { color: color } );
+  var material = new THREE.LineBasicMaterial( { color: color, linewidth: 3 } );
   var points = [];
   points.push( new THREE.Vector3( 0, 0, 0 ) );
   points.push( new THREE.Vector3( x, y, z ) );
@@ -82,6 +87,7 @@ function makeGrid():THREE.Object3D {
   var size = 5;
   var divisions = 5;
   
-  var gridHelper = new THREE.GridHelper( size, divisions );
-  return gridHelper.translateX(2.5).translateZ(2.5)
+  var gridHelper = new THREE.GridHelper( size, divisions ).translateX(2.5).translateZ(2.5);
+  gridHelper.renderOrder = -999
+  return gridHelper
 }
