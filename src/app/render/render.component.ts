@@ -46,17 +46,11 @@ export class RenderComponent implements OnInit {
       let matrix = everything.matrix
       let eigen = everything.ei
       this.removeObjectsWithName("cube")
-      this.removeObjectsWithName("cubeframe")
       
       let cube = makeCube()
       cube.applyMatrix4(matrix)
       cube.name = "cube"
       this.scene.add( cube)
-
-      let cubeframe = makeCubeFrame()
-      cubeframe.applyMatrix4(matrix)
-      cubeframe.name = "cubeframe"
-      this.scene.add( cubeframe)
 
       let aaa = [0,1,2]
       let colors = [0xc0c000, 0x00c0c0, 0xc000c0]//matches with console eigen font colors
@@ -110,7 +104,7 @@ function makeVector(x:number, y:number, z:number, color:number):THREE.Object3D {
   return group
 }
 
-function makeCube():THREE.Mesh {
+function makeCube():Object3D {
 
   var geometry = new THREE.BoxGeometry().translate(0.5,0.5,0.5);
   var material = new THREE.MeshBasicMaterial( { 
@@ -120,18 +114,17 @@ function makeCube():THREE.Mesh {
   } );
   var cube = new THREE.Mesh( geometry, material );
 
-  return cube
-}
-
-function makeCubeFrame():THREE.LineSegments {
-  var material = new THREE.LineBasicMaterial( { color: 0x112233, linewidth: 3 } );
+  var frameMat = new THREE.LineBasicMaterial( { color: 0x112233, linewidth: 3 } );
   let geo = new Geometry()
   geo.vertices = [[0,1,0],[1,1,0],[1,1,0],[1,1,1],[1,1,1],[0,1,1],[0,1,1],[0,1,0],
                   [0,0,0],[1,0,0],[1,0,0],[1,0,1],[1,0,1],[0,0,1],[0,0,1],[0,0,0],
                   [0,0,0],[0,1,0],[1,0,0],[1,1,0],[1,0,1],[1,1,1],[0,0,1],[0,1,1]].map(x=>new Vector3(x[0], x[1], x[2]))
-  let lines = new LineSegments(geo, material)
+  let lines = new LineSegments(geo, frameMat)
   lines.renderOrder = 999
-  return lines
+
+  let group = new Group()
+  group.add(cube, lines)
+  return group
 }
 
 function makeGrid():THREE.Object3D {
