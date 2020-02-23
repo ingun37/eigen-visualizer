@@ -2,7 +2,7 @@ import { Component, OnInit, ElementRef } from '@angular/core';
 import * as THREE from 'three';
 import { Store, select } from '@ngrx/store';
 import { State, selectThreeMatrix } from '../reducers';
-import { Matrix4 } from 'three';
+import { Matrix4, Mesh, Geometry, LineSegments, Vector3 } from 'three';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -26,7 +26,7 @@ export class RenderComponent implements OnInit {
   }
 
   lastCube:THREE.Object3D
-  
+  lastCubeFrame:THREE.LineSegments
   ngOnInit(): void {
     this.scene.background = new THREE.Color(1,1,1)
     this.renderer.setSize( 512, 512 );
@@ -48,10 +48,17 @@ export class RenderComponent implements OnInit {
       if (this.lastCube) {
         this.scene.remove(this.lastCube)
       }
+      if (this.lastCubeFrame) {
+        this.scene.remove(this.lastCubeFrame)
+      }
       this.lastCube = makeCube()
       this.lastCube.applyMatrix4(matrix)
       this.scene.add( this.lastCube)
-      this.scene.remove()
+
+      this.lastCubeFrame = makeCubeFrame()
+      this.lastCubeFrame.applyMatrix4(matrix)
+      this.scene.add( this.lastCubeFrame)
+
       this.renderer.render( this.scene, this.camera );
     })
 
@@ -61,7 +68,7 @@ export class RenderComponent implements OnInit {
 }
 
 function makeAxis(x:number, y:number, z:number, color:number):THREE.Line {
-  var material = new THREE.LineBasicMaterial( { color: color, linewidth: 3 } );
+  var material = new THREE.LineBasicMaterial( { color: color, linewidth: 2 } );
   var points = [];
   points.push( new THREE.Vector3( 0, 0, 0 ) );
   points.push( new THREE.Vector3( x, y, z ) );
@@ -74,13 +81,24 @@ function makeCube():THREE.Mesh {
 
   var geometry = new THREE.BoxGeometry().translate(0.5,0.5,0.5);
   var material = new THREE.MeshBasicMaterial( { 
-    color: 0x00ff00,
+    color: 0x70a0d0,
     transparent: true,
     opacity: 0.5
   } );
   var cube = new THREE.Mesh( geometry, material );
 
   return cube
+}
+
+function makeCubeFrame():THREE.LineSegments {
+  var material = new THREE.LineBasicMaterial( { color: 0x112233, linewidth: 3 } );
+  let geo = new Geometry()
+  geo.vertices = [[0,1,0],[1,1,0],[1,1,0],[1,1,1],[1,1,1],[0,1,1],[0,1,1],[0,1,0],
+                  [0,0,0],[1,0,0],[1,0,0],[1,0,1],[1,0,1],[0,0,1],[0,0,1],[0,0,0],
+                  [0,0,0],[0,1,0],[1,0,0],[1,1,0],[1,0,1],[1,1,1],[0,0,1],[0,1,1]].map(x=>new Vector3(x[0], x[1], x[2]))
+  let lines = new LineSegments(geo, material)
+
+  return lines
 }
 
 function makeGrid():THREE.Object3D {
