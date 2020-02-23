@@ -22,7 +22,7 @@ export class ConsoleComponent implements OnInit {
   ngOnInit(): void {
     this.determinant = this.store.pipe(select(selectDeterminant)).pipe(
       map(det=>{
-        return `determinant: ${det}`
+        return rnd(det)
       })
     )
 
@@ -30,14 +30,20 @@ export class ConsoleComponent implements OnInit {
       map(eigen=> {
         let colors = ["#c0c000", "#00c0c0", "#c000c0"]
         return [0,1,2].map(i=>{
-          return new ShowEigen(colors[i],eigen.diagonalMatrix.get(i,i).toString(), eigen.eigenvectorMatrix.getColumn(i).map(x=>x.toString()).join(", "))
+          return new ShowEigen(
+            colors[i],
+            rnd(eigen.diagonalMatrix.get(i,i)), 
+            eigen.eigenvectorMatrix.getColumn(i).map(x=>rnd(x)).join(", ")
+            )
         })
       })
     )
   }
 
 }
-
+function rnd(n:number):string {
+  return Number(n.toFixed(2)).toString()
+}
 class ShowEigen {
   constructor(
     public color: string,

@@ -97,7 +97,7 @@ function makeCubeFrame():THREE.LineSegments {
                   [0,0,0],[1,0,0],[1,0,0],[1,0,1],[1,0,1],[0,0,1],[0,0,1],[0,0,0],
                   [0,0,0],[0,1,0],[1,0,0],[1,1,0],[1,0,1],[1,1,1],[0,0,1],[0,1,1]].map(x=>new Vector3(x[0], x[1], x[2]))
   let lines = new LineSegments(geo, material)
-
+  lines.renderOrder = 999
   return lines
 }
 
