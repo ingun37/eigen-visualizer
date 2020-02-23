@@ -25,6 +25,13 @@ export class RenderComponent implements OnInit {
       this.scene.remove(this.lastCube)
     }
     this.lastCube = makeCube()
+    let m = new THREE.Matrix4()
+    m.set(1,0,0,0,
+          0,1,0,0,
+          0,0,1,0,
+          0,0,0,1)
+    // this.lastCube.matrix = m
+    this.lastCube.applyMatrix4(m)
     this.scene.add( this.lastCube)
     this.scene.remove()
     this.renderer.render( this.scene, this.camera );
