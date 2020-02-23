@@ -24,7 +24,7 @@ export class ControlComponent implements OnInit {
       let q = [[inputs.e11, inputs.e12, inputs.e13],
                [inputs.e21, inputs.e22, inputs.e23],
                [inputs.e31, inputs.e32, inputs.e33],]
-      let w = q.map(xs=>xs.map(x=>parseInt(x) || 0))
+      let w = q.map(xs=>xs.map(x=>parseFloat(x) || 0))
       this.store.dispatch(matrixAction({matrix: w}))
     })
   }

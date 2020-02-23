@@ -40,7 +40,7 @@ export class RenderComponent implements OnInit {
     this.scene.add( makeAxis(0,100,0, 0x00ff00) );
     this.scene.add( makeAxis(0,0,100, 0x0000ff) );
     this.scene.add( makeAxis(100,0,0, 0xff0000) );
-
+    this.scene.add (makeGrid())
     this.store.pipe(select(selectThreeMatrix)).subscribe(matrix=>{
       if (this.lastCube) {
         this.scene.remove(this.lastCube)
@@ -67,12 +67,21 @@ function makeAxis(x:number, y:number, z:number, color:number):THREE.Line {
 
 function makeCube():THREE.Mesh {
 
-  var geometry = new THREE.BoxGeometry();
+  var geometry = new THREE.BoxGeometry().translate(0.5,0.5,0.5);
   var material = new THREE.MeshBasicMaterial( { 
     color: 0x00ff00,
     transparent: true,
     opacity: 0.5
   } );
   var cube = new THREE.Mesh( geometry, material );
+
   return cube
+}
+
+function makeGrid():THREE.Object3D {
+  var size = 5;
+  var divisions = 5;
+  
+  var gridHelper = new THREE.GridHelper( size, divisions );
+  return gridHelper.translateX(2.5).translateZ(2.5)
 }
