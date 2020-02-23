@@ -1,8 +1,8 @@
 import { Component, OnInit, ElementRef } from '@angular/core';
 import * as THREE from 'three';
 import { Store, select } from '@ngrx/store';
-import { State, selectThreeMatrix, selectEverything } from '../reducers';
-import { Matrix4, Mesh, Geometry, LineSegments, Vector3, CylinderGeometry, Object3D, ConeGeometry, MeshBasicMaterial, Quaternion, Group } from 'three';
+import { State, selectThreeMatrix, selectEverything, Shape } from '../reducers';
+import { Matrix4, Mesh, Geometry, LineSegments, Vector3, CylinderGeometry, Object3D, ConeGeometry, MeshBasicMaterial, Quaternion, Group, Sphere, SphereGeometry } from 'three';
 import { Observable } from 'rxjs';
 
 @Component({
@@ -45,12 +45,19 @@ export class RenderComponent implements OnInit {
     this.store.pipe(select(selectEverything)).subscribe(everything=>{
       let matrix = everything.matrix
       let eigen = everything.ei
-      this.removeObjectsWithName("cube")
+      this.removeObjectsWithName("shape")
       
-      let cube = makeCube()
-      cube.applyMatrix4(matrix)
-      cube.name = "cube"
-      this.scene.add( cube)
+      let sh:Object3D
+      if (everything.sh == Shape.Cube) {
+        sh = makeCube()
+      } else if (everything.sh == Shape.Urchin) {
+        sh = makeUrchin()
+      } else {
+        sh = makeCube()
+      }
+      sh.applyMatrix4(matrix)
+      sh.name = "shape"
+      this.scene.add(sh)
 
       let aaa = [0,1,2]
       let colors = [0xc0c000, 0x00c0c0, 0xc000c0]//matches with console eigen font colors
@@ -134,4 +141,15 @@ function makeGrid():THREE.Object3D {
   var gridHelper = new THREE.GridHelper( size, divisions ).translateX(2.5).translateZ(2.5);
   gridHelper.renderOrder = -999
   return gridHelper
+}
+
+function makeUrchin():Object3D {
+  let sph = new SphereGeometry(1)
+  var material = new THREE.MeshBasicMaterial( { 
+    color: 0x70a0d0,
+    transparent: true,
+    opacity: 0.5
+  } );
+  let msh = new Mesh(sph, material)
+  return msh
 }

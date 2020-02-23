@@ -7,9 +7,10 @@ import { StoreModule } from '@ngrx/store';
 import { reducers, metaReducers } from './reducers';
 import { ControlComponent } from './control/control.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import {MatInputModule} from '@angular/material/input';
+import { MatInputModule } from '@angular/material/input';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ConsoleComponent } from './console/console.component';
+import { MatRadioModule } from '@angular/material/radio';
 
 @NgModule({
   declarations: [
@@ -19,6 +20,7 @@ import { ConsoleComponent } from './console/console.component';
     ConsoleComponent
   ],
   imports: [
+    MatRadioModule,
     FormsModule,
     ReactiveFormsModule,
     MatInputModule,
