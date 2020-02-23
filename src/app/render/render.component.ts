@@ -38,8 +38,8 @@ export class RenderComponent implements OnInit {
     this.camera.lookAt(0,0,0)
 
     this.scene.add( makeAxis(0,100,0, 0x00ff00) );
-    this.scene.add( makeAxis(0,0,100, 0x0000ff) );
-    this.scene.add( makeAxis(100,0,0, 0xff0000) );
+    // this.scene.add( makeAxis(0,0,100, 0x0000ff) );
+    // this.scene.add( makeAxis(100,0,0, 0xff0000) );
     this.scene.add (makeGrid())
     this.store.pipe(select(selectThreeMatrix)).subscribe(matrix=>{
       if (this.lastCube) {

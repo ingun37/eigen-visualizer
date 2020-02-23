@@ -9,12 +9,14 @@ import { ControlComponent } from './control/control.component';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import {MatInputModule} from '@angular/material/input';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
+import { ConsoleComponent } from './console/console.component';
 
 @NgModule({
   declarations: [
     AppComponent,
     RenderComponent,
-    ControlComponent
+    ControlComponent,
+    ConsoleComponent
   ],
   imports: [
     FormsModule,

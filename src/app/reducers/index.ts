@@ -10,7 +10,8 @@ import {
   on
 } from '@ngrx/store';
 import { environment } from '../../environments/environment';
-import { Matrix4 } from 'three';
+import { Matrix4, Matrix3 } from 'three';
+import { EigenvalueDecomposition, determinant } from 'ml-matrix'
 
 export interface State {
   matrix: MatrixState
@@ -44,4 +45,23 @@ export const selectThreeMatrix = createSelector(selectMatrix, (matrixState)=>{
          m3[2][0], m3[2][1], m3[2][2], 0,
          0, 0, 0, 1)
   return m4
+})
+
+export const selectEigen = createSelector(selectMatrix, (matrixState)=>{
+  return new EigenvalueDecomposition(matrixState.m33)
+})
+
+export class Everything {
+  constructor(
+    public matrix:Matrix4,
+    public ei:EigenvalueDecomposition
+  ) {}
+}
+
+export const selectDeterminant = createSelector(selectMatrix, (matrixState)=>{
+  return determinant(matrixState.m33)
+})
+
+export const selectEverything = createSelector(selectThreeMatrix, selectEigen, (mat, ei)=>{
+  return new Everything(mat, ei)
 })
