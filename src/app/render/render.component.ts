@@ -145,7 +145,7 @@ function makeGrid(): THREE.Object3D {
 
 function makeSphere(eigenv:Vector3): Object3D {
   let n = eigenv.normalize()
-  var geometry = new THREE.SphereGeometry(1,18,15)
+  var geometry = new THREE.SphereGeometry(1,22,15)
   geometry.colors = geometry.vertices.map(v=>{
     let red = Math.pow(Math.max(0, n.dot(v.normalize())), 2)
 
