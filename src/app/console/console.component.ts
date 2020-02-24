@@ -15,20 +15,12 @@ export class ConsoleComponent implements OnInit {
   
   constructor(
     private store: Store<State>
-
-  ) { }
-
-  determinant: Observable<string>
-  eigens: Observable<ShowEigen[]>
-
-  
-  ngOnInit(): void {
+  ) { 
     this.determinant = this.store.pipe(select(selectDeterminant)).pipe(
       map(det => {
         return rnd(det)
       })
     )
-
     this.eigens = this.store.pipe(select(selectEigen)).pipe(
       map(eigen => {
         let colors = ["#ff0000", "#00ff00", "#0000ff"]
@@ -41,6 +33,16 @@ export class ConsoleComponent implements OnInit {
         })
       })
     )
+  }
+
+  determinant: Observable<string>
+  eigens: Observable<ShowEigen[]>
+
+  
+  ngOnInit(): void {
+    
+
+    
   }
 
 }
