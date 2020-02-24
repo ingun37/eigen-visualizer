@@ -38,9 +38,7 @@ export class RenderComponent implements OnInit {
 
     this.scene.add(makeGrid())
 
-    this.scene.add(makeAxis(0, 100, 0, 0x00ff00));
-    this.scene.add(makeAxis(100, 0, 0, 0xff0000));
-    this.scene.add(makeAxis(0, 0, 100, 0x0000ff));
+    this.scene.add(makeAxis(0, 100, 0, 0x999999));
 
     this.store.pipe(select(selectEverything)).subscribe(everything => {
       let matrix = everything.matrix
@@ -49,7 +47,7 @@ export class RenderComponent implements OnInit {
       this.removeObjectsWithName("eigenvector")
 
       let aaa = [0, 1, 2]
-      let eigenColors = [0xc0c000, 0x00c0c0, 0xc000c0]//matches with console eigen font colors
+      let eigenColors = [0xff0000, 0x00ff00, 0x0000ff]//matches with console eigen font colors
 
       let eigens = aaa.map(i => {
         let col = eigen.eigenvectorMatrix.getColumn(i)
@@ -93,7 +91,7 @@ export class RenderComponent implements OnInit {
 }
 
 function makeAxis(x: number, y: number, z: number, color: number): THREE.Object3D {
-  var material = new THREE.LineBasicMaterial({ color: color, linewidth: 2 });
+  var material = new THREE.LineBasicMaterial({ color: color, linewidth: 1 });
   var points = [];
   points.push(new THREE.Vector3(0, 0, 0));
   points.push(new THREE.Vector3(x, y, z));
