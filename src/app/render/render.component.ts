@@ -47,6 +47,7 @@ export class RenderComponent implements OnInit {
       this.removeObjectsWithName("eigenvector")
 
       let aaa = [0, 1, 2]
+      let eigenVectors = aaa.map(i=>everything.ei.eigenvectorMatrix.getColumn(i)).map(a=>new Vector3(a[0],a[1],a[2]))
       let eigenColors = [0xff0000, 0x00ff00, 0x0000ff]//matches with console eigen font colors
 
       let eigens = aaa.map(i => {
@@ -61,16 +62,7 @@ export class RenderComponent implements OnInit {
       if (everything.sh == Shape.Cube) {
         sh = makeCube()
       } else if (everything.sh == Shape.Urchin) {
-        let lines = new SphereGeometry(1, 9, 9).vertices.map(v => {
-
-          var g = new THREE.BufferGeometry().setFromPoints([new Vector3(0, 0, 0), v]);
-          var m = new THREE.LineBasicMaterial({ color: 0xf0f000, linewidth: 1 });
-          return new Line(g, m)
-        })
-
-        let g = new Group()
-        g.add(...lines)
-        sh = g
+        sh = makeSphere(eigenVectors[0])
       } else {
         sh = makeCube()
       }
@@ -149,4 +141,20 @@ function makeGrid(): THREE.Object3D {
   var gridHelper = new THREE.GridHelper(size, divisions).translateX(2.5).translateZ(2.5);
   gridHelper.renderOrder = -999
   return gridHelper
+}
+
+function makeSphere(eigenv:Vector3): Object3D {
+  let n = eigenv.normalize()
+  var geometry = new THREE.SphereGeometry(1,18,15)
+  geometry.colors = geometry.vertices.map(v=>{
+    let red = Math.pow(Math.max(0, n.dot(v.normalize())), 2)
+
+    return new THREE.Color(red,0,0)
+  })
+  var material = new THREE.PointsMaterial({
+    vertexColors: THREE.VertexColors,
+    size: 0.1
+  })
+  let sphere = new THREE.Points(geometry, material)
+  return sphere
 }
