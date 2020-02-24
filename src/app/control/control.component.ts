@@ -35,9 +35,9 @@ export class ControlComponent implements OnInit {
     this.cellChildren.forEach(cell=>{
       cell.wheelin.subscribe((x:CellWheelInfo)=>{
         let key = `e${x.row}${x.col}`
-        let val = Number(this.formGroup.controls[key].value)
+        let val = Number(this.formGroup.controls[key].value) + x.deltaY * 0.01
         this.formGroup.patchValue({
-          [key]: val + x.deltaY * 0.01
+          [key]: val.toFixed(2)
         })
       })
     })
