@@ -13,6 +13,7 @@ import { ConsoleComponent } from './console/console.component';
 import { MatRadioModule } from '@angular/material/radio';
 import { CellDirective } from './cell.directive';
 import {MatSliderModule} from '@angular/material/slider';
+import {MatSidenavModule} from '@angular/material/sidenav';
 
 @NgModule({
   declarations: [
@@ -23,6 +24,7 @@ import {MatSliderModule} from '@angular/material/slider';
     CellDirective
   ],
   imports: [
+    MatSidenavModule,
     MatSliderModule,
     MatRadioModule,
     FormsModule,

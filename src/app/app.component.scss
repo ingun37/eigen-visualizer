@@ -1,9 +1,23 @@
 .my-console {
-    position: absolute;
+  position: absolute;
+  left: 0em;
+  padding-left: 1em;
 }
 .my-render {
-    // float: right;
+  // float: right;
 }
 .my-panel {
-    // width: 300px;
+  // width: 300px;
+}
+.my-control {
+    padding: 1em;
+
+}
+.example-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: #eee;
 }
