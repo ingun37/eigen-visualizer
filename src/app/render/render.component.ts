@@ -3,6 +3,7 @@ import * as THREE from 'three';
 import { Store, select } from '@ngrx/store';
 import { State, selectThreeMatrix, selectEverything, Shape } from '../reducers';
 import { Matrix4, Mesh, Geometry, LineSegments, Vector3, CylinderGeometry, Object3D, ConeGeometry, MeshBasicMaterial, Quaternion, Group, Sphere, SphereGeometry, Line } from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { Observable } from 'rxjs';
 
 @Component({
@@ -24,18 +25,28 @@ export class RenderComponent implements OnInit {
     this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
   }
-
+  render(): void {
+    this.renderer.render(this.scene, this.camera);
+  }
   ngOnInit(): void {
     this.scene.background = new THREE.Color(1, 1, 1)
     this.renderer.setSize(512, 512);
     this.ref.nativeElement.appendChild(this.renderer.domElement);
+		
+
+    
+    // var controls = new THREE.OrbitControls( this.camera, this.renderer.domElement );
+    // // controls.addEventListener( 'change', render ); // use this only if there is no animation loop
+    // controls.enableZoom = false;
+    // controls.enablePan = false;
 
     this.camera.position.z = 5;
     this.camera.position.y = 2
     this.camera.position.x = 2
     this.camera.lookAt(0, 0, 0)
 
-
+    let controls = new OrbitControls(this.camera, this.renderer.domElement)
+    controls.addEventListener( 'change', this.render.bind(this) ); // call this only in static scenes (i.e., if there is no animation loop)
     this.scene.add(makeGrid())
 
     this.scene.add(makeAxis(0, 100, 0, 0x999999));
@@ -147,9 +158,8 @@ function makeSphere(eigenv:Vector3): Object3D {
   let n = eigenv.normalize()
   var geometry = new THREE.SphereGeometry(1,22,15)
   geometry.colors = geometry.vertices.map(v=>{
-    let red = Math.pow(Math.max(0, n.dot(v.normalize())), 2)
-
-    return new THREE.Color(red,0,0)
+    let red = Math.pow(Math.max(0, n.dot(v.normalize())), 10)
+    return new THREE.Color(1 * red + 0.8 * (1-red),0.8 * (1-red),0.8 * (1-red))
   })
   var material = new THREE.PointsMaterial({
     vertexColors: THREE.VertexColors,
