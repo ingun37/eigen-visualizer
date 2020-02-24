@@ -2,9 +2,20 @@
     <form [formGroup]="formGroup">
         <div *ngFor="let row of [1,2,3]">
             <mat-form-field *ngFor="let col of [1,2,3]" class="element-form">
-                <mat-label >{{row}}-{{col}}</mat-label>
+                <mat-label>{{row}}-{{col}}</mat-label>
                 <input formControlName="e{{row}}{{col}}" matInput type="text" appCell [row]="row" [col]="col">
             </mat-form-field>
         </div>
     </form>
+</div>
+
+<mat-radio-group class="example-radio-group" (change)="shapeChanged($event)">
+    <mat-radio-button class="example-radio-button" *ngFor="let shape of shapes" [value]="shape.shape"
+        [checked]="shape.checked">
+        {{shape.name}}
+    </mat-radio-button>
+</mat-radio-group>
+
+<div>
+    animation <mat-slider></mat-slider>
 </div>

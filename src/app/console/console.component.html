@@ -5,11 +5,3 @@
         {{eigen.value}} / {{eigen.vector}} <br>
     </span>
 </p>
-<mat-radio-group
-  class="example-radio-group"
-  (change)="shapeChanged($event)"
-  >
-  <mat-radio-button class="example-radio-button" *ngFor="let shape of shapes" [value]="shape.shape" [checked]="shape.checked">
-    {{shape.name}}
-  </mat-radio-button>
-</mat-radio-group>

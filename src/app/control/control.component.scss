@@ -2,5 +2,14 @@
     // width: 512px;
 }
 .element-form {
-    width: 100px;
+    width: 80px;
+}
+.example-radio-group {
+    display: flex;
+    flex-direction: column;
+    margin: 15px 0;
+}
+
+.example-radio-button {
+    margin: 5px;
 }

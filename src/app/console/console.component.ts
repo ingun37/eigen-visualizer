@@ -12,10 +12,7 @@ import { MatRadioChange } from '@angular/material/radio';
 })
 export class ConsoleComponent implements OnInit {
 
-  shapeChanged(shape:MatRadioChange): void {
-    let sh = this.shapes[shape.value].shape
-    this.store.dispatch(chooseShapeAction({shape: sh}))
-  }
+  
   constructor(
     private store: Store<State>
 
@@ -24,10 +21,7 @@ export class ConsoleComponent implements OnInit {
   determinant: Observable<string>
   eigens: Observable<ShowEigen[]>
 
-  shapes: ShapeData[] = [
-    new ShapeData("Cube", Shape.Cube, true),
-    new ShapeData("Urchin", Shape.Urchin, false),
-  ]
+  
   ngOnInit(): void {
     this.determinant = this.store.pipe(select(selectDeterminant)).pipe(
       map(det => {
@@ -58,12 +52,5 @@ class ShowEigen {
     public color: string,
     public value: string,
     public vector: string
-  ) { }
-}
-class ShapeData {
-  constructor(
-    public name: string,
-    public shape: Shape,
-    public checked: boolean
   ) { }
 }

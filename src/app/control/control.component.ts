@@ -1,8 +1,9 @@
 import { Component, OnInit, ViewChildren, QueryList } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { State, matrixAction } from '../reducers';
+import { State, matrixAction, Shape, chooseShapeAction } from '../reducers';
 import { Store } from '@ngrx/store';
 import { CellDirective, CellWheelInfo } from '../cell.directive';
+import { MatRadioChange } from '@angular/material/radio';
 
 @Component({
   selector: 'app-control',
@@ -12,6 +13,10 @@ import { CellDirective, CellWheelInfo } from '../cell.directive';
 export class ControlComponent implements OnInit {
   @ViewChildren(CellDirective) cellChildren !: QueryList<CellDirective>;
 
+  shapes: ShapeData[] = [
+    new ShapeData("Cube", Shape.Cube, true),
+    new ShapeData("Urchin", Shape.Urchin, false),
+  ]
   formGroup = new FormGroup({
     e11: new FormControl('1'), e12: new FormControl('0'), e13: new FormControl('0'),
     e21: new FormControl('0'), e22: new FormControl('1'), e23: new FormControl('0'),
@@ -42,4 +47,17 @@ export class ControlComponent implements OnInit {
       })
     })
   }
+
+  shapeChanged(shape:MatRadioChange): void {
+    let sh = this.shapes[shape.value].shape
+    this.store.dispatch(chooseShapeAction({shape: sh}))
+  }
+}
+
+class ShapeData {
+  constructor(
+    public name: string,
+    public shape: Shape,
+    public checked: boolean
+  ) { }
 }

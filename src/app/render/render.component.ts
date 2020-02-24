@@ -158,7 +158,7 @@ function makeSphere(eigenv:Vector3): Object3D {
   let n = eigenv.normalize()
   var geometry = new THREE.SphereGeometry(1,22,15)
   geometry.colors = geometry.vertices.map(v=>{
-    let red = Math.pow(Math.max(0, n.dot(v.normalize())), 10)
+    let red = Math.pow(Math.abs(n.dot(v.normalize())), 10)
     return new THREE.Color(1 * red + 0.8 * (1-red),0.8 * (1-red),0.8 * (1-red))
   })
   var material = new THREE.PointsMaterial({
