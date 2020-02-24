@@ -1,7 +1,7 @@
 import { Component, OnInit, ElementRef } from '@angular/core';
 import * as THREE from 'three';
 import { Store, select } from '@ngrx/store';
-import { State, selectThreeMatrix, selectEverything, Shape } from '../reducers';
+import { State, selectThreeMatrix, selectEverything, Shape, selectEigen, selectMatrix, selectShape } from '../reducers';
 import { Matrix4, Mesh, Geometry, LineSegments, Vector3, CylinderGeometry, Object3D, ConeGeometry, MeshBasicMaterial, Quaternion, Group, Sphere, SphereGeometry, Line } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 import { Observable } from 'rxjs';
@@ -50,7 +50,6 @@ export class RenderComponent implements OnInit {
     this.scene.add(makeGrid())
 
     this.scene.add(makeAxis(0, 100, 0, 0x999999));
-
     this.store.pipe(select(selectEverything)).subscribe(everything => {
       let matrix = everything.matrix
       let eigen = everything.ei

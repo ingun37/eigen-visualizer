@@ -1,9 +1,10 @@
 import { Component, OnInit, ViewChildren, QueryList } from '@angular/core';
 import { FormGroup, FormControl } from '@angular/forms';
-import { State, matrixAction, Shape, chooseShapeAction } from '../reducers';
+import { State, matrixAction, Shape, chooseShapeAction, interpolateAction } from '../reducers';
 import { Store } from '@ngrx/store';
 import { CellDirective, CellWheelInfo } from '../cell.directive';
 import { MatRadioChange } from '@angular/material/radio';
+import { MatSliderChange } from '@angular/material/slider';
 
 @Component({
   selector: 'app-control',
@@ -51,6 +52,10 @@ export class ControlComponent implements OnInit {
   shapeChanged(shape:MatRadioChange): void {
     let sh = this.shapes[shape.value].shape
     this.store.dispatch(chooseShapeAction({shape: sh}))
+  }
+
+  interpolationChanged(e:MatSliderChange): void {
+    this.store.dispatch(interpolateAction({interpolation: e.value/100}))
   }
 }
 

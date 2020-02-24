@@ -17,5 +17,5 @@
 </mat-radio-group>
 
 <div>
-    animation <mat-slider></mat-slider>
+    animation <mat-slider [value]="100" (input)="interpolationChanged($event)"></mat-slider>
 </div>
