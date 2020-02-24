@@ -11,13 +11,15 @@ import { MatInputModule } from '@angular/material/input';
 import { ReactiveFormsModule, FormsModule } from '@angular/forms';
 import { ConsoleComponent } from './console/console.component';
 import { MatRadioModule } from '@angular/material/radio';
+import { CellDirective } from './cell.directive';
 
 @NgModule({
   declarations: [
     AppComponent,
     RenderComponent,
     ControlComponent,
-    ConsoleComponent
+    ConsoleComponent,
+    CellDirective
   ],
   imports: [
     MatRadioModule,

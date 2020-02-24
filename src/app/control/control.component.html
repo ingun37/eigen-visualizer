@@ -3,7 +3,7 @@
         <div *ngFor="let row of [1,2,3]">
             <mat-form-field *ngFor="let col of [1,2,3]" class="element-form">
                 <mat-label >{{row}}-{{col}}</mat-label>
-                <input formControlName="e{{row}}{{col}}" matInput type="text">
+                <input formControlName="e{{row}}{{col}}" matInput type="text" appCell>
             </mat-form-field>
         </div>
     </form>
