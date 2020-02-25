@@ -23,7 +23,7 @@ export class ConsoleComponent implements OnInit {
     )
     this.eigens = this.store.pipe(select(selectEigen)).pipe(
       map(eigen => {
-        let colors = ["#ff0000", "#00ff00", "#0000ff"]
+        let colors = ["#00ffff", "#ff00ff", "#ffff00"]
         return [0, 1, 2].map(i => {
           return new ShowEigen(
             colors[i],

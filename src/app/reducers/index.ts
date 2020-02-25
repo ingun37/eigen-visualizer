@@ -96,7 +96,7 @@ export const selectShapeModel = createSelector(selectThreeMatrix, selectShape, s
   if (sh == Shape.Cube) {
     o = makeCube()
   } else {
-    o = makeSphere(eVecs[0])
+    o = makeSphere(eVecs)
   }
   o.matrix = mat
   o.matrixAutoUpdate = false
@@ -109,7 +109,7 @@ export const selectShapeModel = createSelector(selectThreeMatrix, selectShape, s
 })
 
 export const selectEigenVectorModels = createSelector(selectEigenVectors, (eVecs)=>{
-  return eVecs.map(v=>makeVector(v, 0xff0000))
+  return eVecs.map((v,i)=>makeVector(v, [0x00ffff, 0xff00ff, 0xffff00][i]))
 })
 
 export const selectModels = createSelector(selectShapeModel, selectEigenVectorModels, (tm, em)=>{
@@ -139,12 +139,12 @@ function makeCube(): THREE.Object3D {
   return group
 }
 
-function makeSphere(eigenv:THREE.Vector3): THREE.Object3D {
-  let n = eigenv.normalize()
+function makeSphere(eVecs:THREE.Vector3[]): THREE.Object3D {
+  let norms = eVecs.map(x=>x.normalize())
   var geometry = new THREE.SphereGeometry(1,30,28)
   geometry.colors = geometry.vertices.map(v=>{
-    let red = Math.pow(Math.abs(n.dot(v.normalize())), 10)
-    return new THREE.Color(1 * red + 0.8 * (1-red),0.8 * (1-red),0.8 * (1-red))
+    let rgb = norms.map(x=> Math.pow(Math.abs( x.dot(v.normalize())), 20) ).map(x=>0 * x + 0.95 * (1-x))
+    return new THREE.Color(rgb[0], rgb[1], rgb[2])
   })
   var material = new THREE.PointsMaterial({
     vertexColors: THREE.VertexColors,
