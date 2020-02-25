@@ -100,7 +100,7 @@ export const selectShapeModel = createSelector(selectThreeMatrix, selectShape, s
   }
   o.matrix = mat
   o.matrixAutoUpdate = false
-  o.matrixWorldNeedsUpdate = true
+  // o.matrixWorldNeedsUpdate = true
   o.updateMatrixWorld(true)
   // o.matrixAutoUpdate = false
   // o.applyMatrix4(mat)
