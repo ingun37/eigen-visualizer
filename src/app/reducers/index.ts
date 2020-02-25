@@ -98,7 +98,13 @@ export const selectShapeModel = createSelector(selectThreeMatrix, selectShape, s
   } else {
     o = makeSphere(eVecs[0])
   }
-  o.applyMatrix4(mat)
+  o.matrix = mat
+  o.matrixAutoUpdate = false
+  o.matrixWorldNeedsUpdate = true
+  o.updateMatrixWorld(true)
+  // o.matrixAutoUpdate = false
+  // o.applyMatrix4(mat)
+  // o.updateMatrix()
   return o
 })
 
@@ -135,7 +141,7 @@ function makeCube(): THREE.Object3D {
 
 function makeSphere(eigenv:THREE.Vector3): THREE.Object3D {
   let n = eigenv.normalize()
-  var geometry = new THREE.SphereGeometry(1,22,15)
+  var geometry = new THREE.SphereGeometry(1,30,28)
   geometry.colors = geometry.vertices.map(v=>{
     let red = Math.pow(Math.abs(n.dot(v.normalize())), 10)
     return new THREE.Color(1 * red + 0.8 * (1-red),0.8 * (1-red),0.8 * (1-red))
