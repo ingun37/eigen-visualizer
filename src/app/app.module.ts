@@ -14,6 +14,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { CellDirective } from './cell.directive';
 import {MatSliderModule} from '@angular/material/slider';
 import {MatSidenavModule} from '@angular/material/sidenav';
+import { MatrixPreviewComponent } from './matrix-preview/matrix-preview.component';
 
 @NgModule({
   declarations: [
@@ -21,7 +22,8 @@ import {MatSidenavModule} from '@angular/material/sidenav';
     RenderComponent,
     ControlComponent,
     ConsoleComponent,
-    CellDirective
+    CellDirective,
+    MatrixPreviewComponent
   ],
   imports: [
     MatSidenavModule,
