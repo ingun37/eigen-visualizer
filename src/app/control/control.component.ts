@@ -71,6 +71,12 @@ export class ControlComponent implements OnInit {
         e21:-4, e22: -6, e23:-3,
         e31:3,  e32: 3, e33:1,
       })
+    } else if (n == 2) {
+      this.formGroup.setValue({
+        e11:5,  e12: -8,  e13:1,
+        e21:0, e22: 0, e23:7,
+        e31:0,  e32: 0, e33:-2,
+      })
     }
   }
 }
