@@ -9,6 +9,7 @@
     </form>
 </div>
 <button mat-raised-button (click)="sampleClicked(0)">Sample 1</button>
+<button mat-raised-button (click)="sampleClicked(1)">Sample 2</button>
 <mat-radio-group class="example-radio-group" (change)="shapeChanged($event)">
     <mat-radio-button class="example-radio-button" *ngFor="let shape of shapes" [value]="shape.shape"
         [checked]="shape.checked">
