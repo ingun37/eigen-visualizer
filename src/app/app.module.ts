@@ -15,6 +15,7 @@ import { CellDirective } from './cell.directive';
 import {MatSliderModule} from '@angular/material/slider';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import { MatrixPreviewComponent } from './matrix-preview/matrix-preview.component';
+import {MatButtonModule} from '@angular/material/button';
 
 @NgModule({
   declarations: [
@@ -26,6 +27,7 @@ import { MatrixPreviewComponent } from './matrix-preview/matrix-preview.componen
     MatrixPreviewComponent
   ],
   imports: [
+    MatButtonModule,
     MatSidenavModule,
     MatSliderModule,
     MatRadioModule,
