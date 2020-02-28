@@ -1,4 +1,8 @@
 import { Component } from '@angular/core';
+import { Store, select } from '@ngrx/store';
+import { State, selectThreeMatrix } from './reducers';
+import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -7,4 +11,14 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'eigen';
+  interpolatedMatrix: Observable<string[][]>
+  constructor(
+    private store:Store<State>
+  ) {
+    this.interpolatedMatrix = store.pipe(select(selectThreeMatrix)).pipe(
+      map(x => {
+        return [0, 1, 2, 3].map(i => [0, 1, 2, 3].map(j => x.elements[j * 4 + i].toFixed(2)))
+      })
+    )
+  }
 }
