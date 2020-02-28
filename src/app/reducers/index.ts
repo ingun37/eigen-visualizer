@@ -179,7 +179,14 @@ function makeVector(v:THREE.Vector3, color: number): THREE.Object3D {
 function makeSphere(eVecs:THREE.Vector3[]): THREE.Object3D {
   let norms = eVecs.map(x=>x.normalize())
   var geometry = new THREE.SphereGeometry(1,10,10)
+  let uniforms = {
+    "eigen1": { value: eVecs[0] },
+    "eigen2": { value: eVecs[1] },
+    "eigen3": { value: eVecs[2] },
+  };
   var material = new THREE.ShaderMaterial({
+    transparent: true,
+    uniforms: uniforms,
     vertexShader: `
     varying vec3 vNormal;
     void main() {
@@ -188,12 +195,23 @@ function makeSphere(eVecs:THREE.Vector3[]): THREE.Object3D {
     }
     `,
     fragmentShader: `
+    uniform vec3 eigen1;
+    uniform vec3 eigen2;
+    uniform vec3 eigen3;
     varying vec3 vNormal;
+    float compute(vec3 eigen) {
+      float w = pow(abs(dot(vNormal, eigen)), 10.0);
+      return 0.0*w + 0.95*(1.0-w);
+    }
     void main() {
-        gl_FragColor = vec4(1,0,0,1);
+        float r = compute(eigen1);
+        float g = compute(eigen2);
+        float b = compute(eigen3);
+        gl_FragColor = vec4(r,g,b,1.0 - (r*g*b));
     }
     `
   })
+  //let rgb = norms.map(x=> Math.pow(Math.abs( x.dot(v.normalize())), 20) ).map(x=>0 * x + 0.95 * (1-x))
   let sphere = new THREE.Mesh(geometry, material)
   return sphere
 }
