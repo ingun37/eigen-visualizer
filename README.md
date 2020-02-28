@@ -2,7 +2,7 @@
 
 I made it for myself to grasp the concept of eigen vector and determinant.
 
-It demonstrates eigen vectors preserving it's direction throughout the transformation by animating linear interpolation from identity matrix to transformation matrix. (I'm not advocating the idea of using linear-interpolation of matrix as a technique for general animation. Linear interpolating matrix is a bad way to animate anything. Linear interpolating matrix here has no mathematical or technical meaning. It's an arbitrary choice for tweening between initial and transformed state.)
+It demonstrates eigen vectors preserving it's direction throughout the transformation by animating linear interpolation from identity matrix to transformation matrix. (I'm not advocating the idea of linear-interpolating the matrix. Linear interpolating matrix is a bad way to animate anything. Linear interpolating matrix here has no mathematical or technical meaning. It's an arbitrary choice for tweening between initial and transformed state.)
 
 ![](https://raw.githubusercontent.com/ingun37/eigen-visualizer/master/previews/sphere.gif)  
 ![](https://raw.githubusercontent.com/ingun37/eigen-visualizer/master/previews/urchin.gif)  
