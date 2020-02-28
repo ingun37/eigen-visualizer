@@ -1,4 +1,15 @@
-# Eigen
+# Eigen vector visualizer
+
+I made it for myself to grasp the concept of eigen vector and determinant.
+
+It demonstrates eigen vectors preserving it's direction throughout the transformation by animating linear interpolation from identity matrix to transformation matrix.  
+***DISCLAIMER*** I'm not advocating the idea of using linear-interpolation of matrix for general animation technique. Linear interpolating matrix here has no mathematical or technical meaning. It's an arbitrary choice for tweening between initial and transformed state.
+
+![](https://raw.githubusercontent.com/ingun37/eigen-visualizer/master/previews/sphere.gif)  
+![](https://raw.githubusercontent.com/ingun37/eigen-visualizer/master/previews/urchin.gif)  
+![](https://raw.githubusercontent.com/ingun37/eigen-visualizer/master/previews/cube.gif)  
+
+---
 
 This project was generated with [Angular CLI](https://github.com/angular/angular-cli) version 9.0.3.
 

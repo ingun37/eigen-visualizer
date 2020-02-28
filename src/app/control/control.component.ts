@@ -60,7 +60,13 @@ export class ControlComponent implements OnInit {
   }
 
   sampleClicked(n:number): void {
-    if (n == 0) {
+    if (n == -1) {
+      this.formGroup.setValue({
+        e11:1,  e12: 0,  e13:0,
+        e21:0, e22: 1, e23:0,
+        e31:0,  e32: 0, e33:1,
+      })
+    } else if (n == 0) {
       this.formGroup.setValue({
         e11:1,  e12: 3,  e13:3,
         e21:-3, e22: -5, e23:-3,

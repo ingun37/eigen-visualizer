@@ -20,7 +20,7 @@ export class RenderComponent implements OnInit {
   ) {
     this.scene = new THREE.Scene();
     this.renderer = new THREE.WebGLRenderer();
-    this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+    this.camera = new THREE.PerspectiveCamera(75, 1, 0.1, 1000);
 
   }
   render(): void {
@@ -28,7 +28,8 @@ export class RenderComponent implements OnInit {
   }
   ngOnInit(): void {
     this.scene.background = new THREE.Color(1, 1, 1)
-    this.renderer.setSize(512, 512);
+    let aa = Math.floor( Math.min(window.innerWidth, window.innerHeight) * 0.8)
+    this.renderer.setSize(aa, aa);
     this.ref.nativeElement.appendChild(this.renderer.domElement);
 		
     this.camera.position.z = 5;
