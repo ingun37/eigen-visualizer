@@ -10,7 +10,7 @@ import {
   on
 } from '@ngrx/store';
 import { environment } from '../../environments/environment';
-import { Matrix4, Matrix3, Object3D } from 'three';
+import { Matrix4, Matrix3, Object3D, DoubleSide } from 'three';
 import * as THREE from 'three';
 import Matrix, { EigenvalueDecomposition, determinant } from 'ml-matrix'
 
@@ -89,7 +89,7 @@ export const selectShape = (state: State) => state.shape
 
 
 export const selectEigenVectors = createSelector(selectEigen, (eigen)=>{
-  return [0,1,2].map(i=>eigen.eigenvectorMatrix.getColumn(i)).map(c=>new THREE.Vector3(c[0],c[1],c[2]))
+  return [0,1,2].filter(x=>eigen.imaginaryEigenvalues[x] == 0).map(i=>eigen.eigenvectorMatrix.getColumn(i)).map(c=>new THREE.Vector3(c[0],c[1],c[2]))
 })
 
 export const selectShapeModel = createSelector(selectThreeMatrix, selectShape, selectEigenVectors, (mat, sh, eVecs)=>{
@@ -143,7 +143,13 @@ function makeCube(): THREE.Object3D {
 }
 
 function makeUrchin(eVecs:THREE.Vector3[]): THREE.Object3D {
-  let norms = eVecs.map(x=>x.normalize())
+  let norms = [0,1,2].map(i=>{
+    if (i < eVecs.length) {
+      return eVecs[i].normalize()
+    } else {
+      return new THREE.Vector3(0,0,0)
+    }
+  })
   var geometry = new THREE.SphereGeometry(1,30,28)
   geometry.colors = geometry.vertices.map(v=>{
     let rgb = norms.map(x=> Math.pow(Math.abs( x.dot(v.normalize())), 20) ).map(x=>0 * x + 0.95 * (1-x))
@@ -177,12 +183,18 @@ function makeVector(v:THREE.Vector3, color: number): THREE.Object3D {
 }
 
 function makeSphere(eVecs:THREE.Vector3[]): THREE.Object3D {
-  let norms = eVecs.map(x=>x.normalize())
+  let norms = [0,1,2].map(i=>{
+    if (i<eVecs.length) {
+      return eVecs[i].normalize()
+    } else {
+      return new THREE.Vector3(0,0,0)
+    }
+  })
   var geometry = new THREE.SphereGeometry(1,10,10)
   let uniforms = {
-    "eigen1": { value: eVecs[0] },
-    "eigen2": { value: eVecs[1] },
-    "eigen3": { value: eVecs[2] },
+    "eigen1": { value: norms[0] },
+    "eigen2": { value: norms[1] },
+    "eigen3": { value: norms[2] },
   };
   var material = new THREE.ShaderMaterial({
     transparent: true,
@@ -213,5 +225,14 @@ function makeSphere(eVecs:THREE.Vector3[]): THREE.Object3D {
   })
   //let rgb = norms.map(x=> Math.pow(Math.abs( x.dot(v.normalize())), 20) ).map(x=>0 * x + 0.95 * (1-x))
   let sphere = new THREE.Mesh(geometry, material)
-  return sphere
+  let frameMat = new THREE.LineBasicMaterial({
+    opacity: 0.2,
+    color: 0x000000, 
+    // linewidth: 3,
+    transparent: true
+  });
+  let frameObj = new THREE.LineSegments(geometry, frameMat)
+  let group = new THREE.Group()
+  group.add(sphere, frameObj)
+  return group
 }
