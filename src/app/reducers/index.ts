@@ -29,7 +29,8 @@ class MatrixState {
 
 export enum Shape {
   Cube,
-  Urchin
+  Urchin,
+  Sphere
 }
 export const chooseShapeAction = createAction('[Shape Component] Choose', props<{ shape: Shape }>());
 export const matrixAction = createAction('[Matrix Component] Set', props<{ matrix: number[][] }>());
@@ -95,6 +96,8 @@ export const selectShapeModel = createSelector(selectThreeMatrix, selectShape, s
   let o:THREE.Object3D
   if (sh == Shape.Cube) {
     o = makeCube()
+  } else if (sh == Shape.Urchin) {
+    o = makeUrchin(eVecs)
   } else {
     o = makeSphere(eVecs)
   }
@@ -139,7 +142,7 @@ function makeCube(): THREE.Object3D {
   return group
 }
 
-function makeSphere(eVecs:THREE.Vector3[]): THREE.Object3D {
+function makeUrchin(eVecs:THREE.Vector3[]): THREE.Object3D {
   let norms = eVecs.map(x=>x.normalize())
   var geometry = new THREE.SphereGeometry(1,30,28)
   geometry.colors = geometry.vertices.map(v=>{
@@ -171,4 +174,26 @@ function makeVector(v:THREE.Vector3, color: number): THREE.Object3D {
   group.setRotationFromQuaternion(q)
   group.renderOrder = 500
   return group
+}
+
+function makeSphere(eVecs:THREE.Vector3[]): THREE.Object3D {
+  let norms = eVecs.map(x=>x.normalize())
+  var geometry = new THREE.SphereGeometry(1,10,10)
+  var material = new THREE.ShaderMaterial({
+    vertexShader: `
+    varying vec3 vNormal;
+    void main() {
+        vNormal = normal;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
+    }
+    `,
+    fragmentShader: `
+    varying vec3 vNormal;
+    void main() {
+        gl_FragColor = vec4(1,0,0,1);
+    }
+    `
+  })
+  let sphere = new THREE.Mesh(geometry, material)
+  return sphere
 }

@@ -16,7 +16,8 @@ export class ControlComponent implements OnInit {
 
   shapes: ShapeData[] = [
     new ShapeData("Cube", Shape.Cube, true),
-    new ShapeData("Sphere", Shape.Urchin, false),
+    new ShapeData("Urchin", Shape.Urchin, false),
+    new ShapeData("Sphere", Shape.Sphere, false),
   ]
   formGroup = new FormGroup({
     e11: new FormControl('1'), e12: new FormControl('0'), e13: new FormControl('0'),
