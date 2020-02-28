@@ -2,8 +2,13 @@
     <mat-sidenav mode="side" opened>
         <div class="my-control">
             <app-control ></app-control>
-        </div>   
+        </div>
+        <span style="font-weight: bold;">Linear Interpolated Matrix</span>
         <app-matrix-preview [rows]="interpolatedMatrix"></app-matrix-preview>
+        <span style="font-weight: bold;">Real Eigen Values</span>
+        <app-matrix-preview [rows]="realEigenvalues"></app-matrix-preview>
+        <span style="font-weight: bold;">Complex Eigen Values</span>
+        <app-matrix-preview [rows]="complexEigenvalues"></app-matrix-preview>
     </mat-sidenav>
     <mat-sidenav-content>
         <app-render class="my-render"></app-render>
