@@ -68,21 +68,21 @@ export class ControlComponent implements OnInit {
       })
     } else if (n == 0) {
       this.formGroup.setValue({
-        e11:1,  e12: 3,  e13:3,
-        e21:-3, e22: -5, e23:-3,
-        e31:3,  e32: 3, e33:1,
+        e11:1,   e12: 2.5, e13:0.3,
+        e21:2.5, e22: 1,   e23:-3,
+        e31:0.3, e32: -3,  e33:1,
       })
     } else if (n==1) {
       this.formGroup.setValue({
-        e11:2,  e12: 4,  e13:3,
-        e21:-4, e22: -6, e23:-3,
-        e31:3,  e32: 3, e33:1,
+        e11:0.8,  e12: 1,   e13:0.4,
+        e21:1,    e22: 1.7, e23:1.4,
+        e31:0.4,  e32: 1.4, e33:2,
       })
     } else if (n == 2) {
       this.formGroup.setValue({
-        e11:5,  e12: -8,  e13:1,
-        e21:0, e22: 0, e23:7,
-        e31:0,  e32: 0, e33:-2,
+        e11:-3.46,  e12: 1.06,  e13:-0.09,
+        e21:0.18, e22: 1.70, e23:-0.12,
+        e31:-1.35,  e32: -0.06, e33:2.08,
       })
     }
   }

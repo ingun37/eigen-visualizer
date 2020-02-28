@@ -9,10 +9,10 @@
     </form>
 </div>
 
-<button mat-raised-button (click)="sampleClicked(0)">Sample 1</button>
-<button mat-raised-button (click)="sampleClicked(1)">Sample 2</button> <br>
-<button mat-raised-button (click)="sampleClicked(2)">Sample 3</button>
-<button mat-raised-button (click)="sampleClicked(-1)">Reset</button>
+<button class="sample-button" mat-raised-button (click)="sampleClicked(-1)">Reset</button> <br>
+<button class="sample-button" mat-raised-button (click)="sampleClicked(0)">Symmetric Matrix Sample</button> <br>
+<button class="sample-button" mat-raised-button (click)="sampleClicked(1)">2D eigen space</button> <br>
+<button class="sample-button" mat-raised-button (click)="sampleClicked(2)">Random Sample</button>
 
 <mat-radio-group class="example-radio-group" (change)="shapeChanged($event)">
     <mat-radio-button class="example-radio-button" *ngFor="let shape of shapes" [value]="shape.shape"

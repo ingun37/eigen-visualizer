@@ -89,7 +89,10 @@ export const selectShape = (state: State) => state.shape
 
 
 export const selectEigenVectors = createSelector(selectEigen, (eigen)=>{
-  return [0,1,2].filter(x=>eigen.imaginaryEigenvalues[x] == 0).map(i=>eigen.eigenvectorMatrix.getColumn(i)).map(c=>new THREE.Vector3(c[0],c[1],c[2]))
+  return [0,1,2]
+    .filter(x=>eigen.imaginaryEigenvalues[x] == 0 && Math.abs(eigen.realEigenvalues[x]) > 0.000001)
+    .map(i=>eigen.eigenvectorMatrix.getColumn(i))
+    .map(c=>new THREE.Vector3(c[0],c[1],c[2]))
 })
 
 export const selectShapeModel = createSelector(selectThreeMatrix, selectShape, selectEigenVectors, (mat, sh, eVecs)=>{
