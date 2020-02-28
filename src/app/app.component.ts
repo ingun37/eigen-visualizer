@@ -17,7 +17,7 @@ export class AppComponent {
   ) {
     this.interpolatedMatrix = store.pipe(select(selectThreeMatrix)).pipe(
       map(x => {
-        return [0, 1, 2, 3].map(i => [0, 1, 2, 3].map(j => x.elements[j * 4 + i].toFixed(2)))
+        return [0, 1, 2].map(i => [0, 1, 2].map(j => Number( x.elements[j * 4 + i].toFixed(2)).toString()))
       })
     )
   }
