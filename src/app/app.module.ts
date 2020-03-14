@@ -16,6 +16,7 @@ import {MatSliderModule} from '@angular/material/slider';
 import {MatSidenavModule} from '@angular/material/sidenav';
 import { MatrixPreviewComponent } from './matrix-preview/matrix-preview.component';
 import {MatButtonModule} from '@angular/material/button';
+import { DecomposeComponent } from './decompose/decompose.component';
 
 @NgModule({
   declarations: [
@@ -24,7 +25,8 @@ import {MatButtonModule} from '@angular/material/button';
     ControlComponent,
     ConsoleComponent,
     CellDirective,
-    MatrixPreviewComponent
+    MatrixPreviewComponent,
+    DecomposeComponent
   ],
   imports: [
     MatButtonModule,
