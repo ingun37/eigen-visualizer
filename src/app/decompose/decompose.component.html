@@ -1,4 +1,11 @@
-<p>decompose works!</p>
-<app-matrix-preview [rows]="mP"></app-matrix-preview>
-<app-matrix-preview [rows]="mD"></app-matrix-preview>
-<app-matrix-preview [rows]="mPinv"></app-matrix-preview>
+<div style="display: flex;">
+    <app-matrix-preview [rows]="mP"></app-matrix-preview>
+    <app-matrix-preview [rows]="mD"></app-matrix-preview>
+    <app-matrix-preview [rows]="mPinv"></app-matrix-preview>
+</div>
+
+<div style="display: flex;">
+    <app-matrix-preview [rows]="interpP"></app-matrix-preview>
+    <app-matrix-preview [rows]="interpD"></app-matrix-preview>
+    <app-matrix-preview [rows]="interpPinv"></app-matrix-preview>
+</div>
