@@ -12,6 +12,7 @@ import Matrix, { inverse } from 'ml-matrix';
   styleUrls: ['./decompose.component.scss']
 })
 export class DecomposeComponent implements OnInit {
+  pdptex: Observable<string>
   mP: Observable<string[][]>
   mD: Observable<string[][]>
   mPinv: Observable<string[][]>
@@ -23,6 +24,11 @@ export class DecomposeComponent implements OnInit {
   constructor(
     private store: Store<State>
   ) {
+    this.pdptex = store.pipe(select(selectDecompose)).pipe(
+      map(pdp=>{
+        return [pdp.P, pdp.D, pdp.iP].map(mat2tex).join(" ")
+      })
+    )
     this.mP = store.pipe(select(selectDecompose)).pipe(
       map(x=>x.P),
       map(rows3)
@@ -51,4 +57,17 @@ function rows3(of:Matrix):string[][] {
       return of.getRow(ri)[ci].toFixed(2)
     })
   })
+}
+function mat2tex(mat:Matrix):string {
+  return "\\begin{pmatrix} " + rng(mat.rows).map(i=>mat.getRow(i)).map(row=>row.map(num2str).join(" & ")).join(' \\\\ ') + " \\end{pmatrix}"
+}
+function rng(n:number):number[] {
+  var arr:number[] = []
+  for (let index = 0; index < n; index++) {
+    arr.push(index)
+  }
+  return arr
+}
+function num2str(n:number):string {
+  return Number(n.toFixed(2)).toString()
 }

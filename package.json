@@ -23,6 +23,7 @@
     "@angular/router": "~9.0.2",
     "@ngrx/store": "^8.6.0",
     "ml-matrix": "^6.4.1",
+    "ng-katex": "^2.0.3",
     "rxjs": "~6.5.4",
     "three": "^0.113.2",
     "tslib": "^1.10.0",

@@ -1,11 +1,7 @@
-<div style="display: flex;">
-    <app-matrix-preview [rows]="mP"></app-matrix-preview>
-    <app-matrix-preview [rows]="mD"></app-matrix-preview>
-    <app-matrix-preview [rows]="mPinv"></app-matrix-preview>
-</div>
+<ng-katex [equation]="pdptex | async"></ng-katex>
 
-<div style="display: flex;">
+<!-- <div style="display: flex;">
     <app-matrix-preview [rows]="interpP"></app-matrix-preview>
     <app-matrix-preview [rows]="interpD"></app-matrix-preview>
     <app-matrix-preview [rows]="interpPinv"></app-matrix-preview>
-</div>
+</div> -->

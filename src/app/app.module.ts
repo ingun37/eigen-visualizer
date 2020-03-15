@@ -17,6 +17,7 @@ import {MatSidenavModule} from '@angular/material/sidenav';
 import { MatrixPreviewComponent } from './matrix-preview/matrix-preview.component';
 import {MatButtonModule} from '@angular/material/button';
 import { DecomposeComponent } from './decompose/decompose.component';
+import { KatexModule } from 'ng-katex';
 
 @NgModule({
   declarations: [
@@ -26,9 +27,10 @@ import { DecomposeComponent } from './decompose/decompose.component';
     ConsoleComponent,
     CellDirective,
     MatrixPreviewComponent,
-    DecomposeComponent
+    DecomposeComponent,
   ],
   imports: [
+    KatexModule,
     MatButtonModule,
     MatSidenavModule,
     MatSliderModule,
