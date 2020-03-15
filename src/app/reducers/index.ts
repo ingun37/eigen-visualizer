@@ -62,11 +62,59 @@ export const selectMatrix = (state: State) => state.matrix
 
 export const selectInterpolation = (state: State) => state.interpolation
 
-export const selectThreeMatrix = createSelector(selectMatrix, selectInterpolation, (matrixState, interp) => {
-  let x = new Matrix(matrixState.m33)
-  let y = new Matrix([[1,0,0],[0,1,0],[0,0,1]])
-  let z = x.mul(interp).add(y.mul(1-interp))
+export const selectEigen = createSelector(selectMatrix, (matrixState) => {
+  return new EigenvalueDecomposition(matrixState.m33)
+})
 
+export const selectDecompose = createSelector(selectEigen, (eigen)=>{
+  return {
+    P: (eigen.eigenvectorMatrix),
+    D: (eigen.diagonalMatrix),
+    iP: (inverse(eigen.eigenvectorMatrix))
+  }
+})
+enum InterpStage { Pinv,  D,  P }
+const interpStageOf = (weight:number):[InterpStage, number]=>{
+  if (weight < 0.333) {
+    return [InterpStage.Pinv, weight/0.333]
+  } else if (weight < 0.666) {
+    return [InterpStage.D, weight/0.333 - 1]
+  } else {
+    return [InterpStage.P, weight/0.333 - 2]
+  }
+}
+export const selectInterpPinv = createSelector(selectInterpolation, selectDecompose, (weight, decom)=>{
+  let [stage, stageW] = interpStageOf(weight)
+  if (stage == InterpStage.Pinv) {
+    return (interpMat(Matrix.eye(3,3), stageW, (decom.iP)))
+  } else {
+    return decom.iP
+  }
+})
+export const selectInterpD = createSelector(selectInterpolation, selectDecompose, (weight, decom)=>{
+  let [stage, stageW] = interpStageOf(weight)
+  if (stage == InterpStage.D) {
+    return (interpMat(Matrix.eye(3,3), stageW, (decom.D)))
+  } else if (stage == InterpStage.P) {
+    return decom.D
+  } else {
+    return (Matrix.eye(3,3))
+  }
+})
+export const selectInterpP = createSelector(selectInterpolation, selectDecompose, (weight, decom)=>{
+  let [stage, stageW] = interpStageOf(weight)
+  if (stage == InterpStage.P) {
+    return (interpMat(Matrix.eye(3,3), stageW, (decom.P)))
+  } else {
+    return (Matrix.eye(3,3))
+  }
+})
+
+
+export const selectThreeMatrix = createSelector(selectInterpP, selectInterpD, selectInterpPinv, (P,D,Pi) => {
+  
+  let z = P.mmul(D).mmul(Pi)
+  
   let m3 = [0,1,2].map(i=>z.getRow(i))
   let m4 = new Matrix4()
   m4.set(
@@ -75,10 +123,6 @@ export const selectThreeMatrix = createSelector(selectMatrix, selectInterpolatio
     m3[2][0], m3[2][1], m3[2][2], 0,
     0, 0, 0, 1)
   return m4
-})
-
-export const selectEigen = createSelector(selectMatrix, (matrixState) => {
-  return new EigenvalueDecomposition(matrixState.m33)
 })
 
 export const selectDeterminant = createSelector(selectMatrix, (matrixState) => {
@@ -253,49 +297,6 @@ function conv3(p:Matrix3):Matrix {
     return [0,1,2].map(ci=>p.elements[ci*3 + ri])
   }))
 }
-export const selectDecompose = createSelector(selectEigen, (eigen)=>{
-  return {
-    P: (eigen.eigenvectorMatrix),
-    D: (eigen.diagonalMatrix),
-    iP: (inverse(eigen.eigenvectorMatrix))
-  }
-})
-enum InterpStage { Pinv,  D,  P }
-const interpStageOf = (weight:number):[InterpStage, number]=>{
-  if (weight < 0.333) {
-    return [InterpStage.Pinv, weight/0.333]
-  } else if (weight < 0.666) {
-    return [InterpStage.D, weight/0.333 - 1]
-  } else {
-    return [InterpStage.P, weight/0.333 - 2]
-  }
-}
-export const selectInterpPinv = createSelector(selectInterpolation, selectDecompose, (weight, decom)=>{
-  let [stage, stageW] = interpStageOf(weight)
-  if (stage == InterpStage.Pinv) {
-    return (interpMat(Matrix.eye(3,3), stageW, (decom.iP)))
-  } else {
-    return decom.iP
-  }
-})
-export const selectInterpD = createSelector(selectInterpolation, selectDecompose, (weight, decom)=>{
-  let [stage, stageW] = interpStageOf(weight)
-  if (stage == InterpStage.D) {
-    return (interpMat(Matrix.eye(3,3), stageW, (decom.D)))
-  } else if (stage == InterpStage.P) {
-    return decom.D
-  } else {
-    return (Matrix.eye(3,3))
-  }
-})
-export const selectInterpP = createSelector(selectInterpolation, selectDecompose, (weight, decom)=>{
-  let [stage, stageW] = interpStageOf(weight)
-  if (stage == InterpStage.P) {
-    return (interpMat(Matrix.eye(3,3), stageW, (decom.P)))
-  } else {
-    return (Matrix.eye(3,3))
-  }
-})
 function interpMat(x:Matrix, w:number, y:Matrix):Matrix {
   let X = Matrix.multiply(x, 1-w)
   let Y = Matrix.multiply(y, w)
