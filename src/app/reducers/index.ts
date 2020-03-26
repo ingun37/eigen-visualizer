@@ -10,7 +10,7 @@ import {
   on
 } from '@ngrx/store';
 import { environment } from '../../environments/environment';
-import { Matrix4, Matrix3, Object3D, DoubleSide } from 'three';
+import { Matrix4, Matrix3, Object3D, DoubleSide, Vector3, Quaternion } from 'three';
 import * as THREE from 'three';
 import Matrix, { EigenvalueDecomposition, determinant, inverse } from 'ml-matrix'
 
@@ -86,7 +86,7 @@ const interpStageOf = (weight:number):[InterpStage, number]=>{
 export const selectInterpPinv = createSelector(selectInterpolation, selectDecompose, (weight, decom)=>{
   let [stage, stageW] = interpStageOf(weight)
   if (stage == InterpStage.Pinv) {
-    return (interpMat(Matrix.eye(3,3), stageW, (decom.iP)))
+    return (slerpMat(Matrix.eye(3,3), stageW, (decom.iP)))
   } else {
     return decom.iP
   }
@@ -104,7 +104,7 @@ export const selectInterpD = createSelector(selectInterpolation, selectDecompose
 export const selectInterpP = createSelector(selectInterpolation, selectDecompose, (weight, decom)=>{
   let [stage, stageW] = interpStageOf(weight)
   if (stage == InterpStage.P) {
-    return (interpMat(Matrix.eye(3,3), stageW, (decom.P)))
+    return (slerpMat(Matrix.eye(3,3), stageW, (decom.P)))
   } else {
     return (Matrix.eye(3,3))
   }
@@ -301,4 +301,34 @@ function interpMat(x:Matrix, w:number, y:Matrix):Matrix {
   let X = Matrix.multiply(x, 1-w)
   let Y = Matrix.multiply(y, w)
   return Matrix.add(X,Y)
+}
+const zip = (arr1:Vector3[], arr2:Vector3[]) => arr1.map((k, i) => [k, arr2[i]]);
+function slerpMat(x:Matrix, w:number, y:Matrix):Matrix {
+  let xcols = columnsM(x)
+  let ycols = columnsM(y)
+  return xcols.map((xcol, ci)=>{
+    let ycol = ycols[ci]
+    return slerpVec(xcol, w, ycol)
+  }).reduce((mat,col,i)=>{
+    return mat.setColumn(i,[col.x,col.y,col.z])
+  }, new Matrix(3,3))
+}
+const rng = (n:number)=>Array.from(Array(n).keys())
+function columnsM(x:Matrix):Vector3[] {
+  return rng(x.columns).map(ci=>{
+    let col = x.getColumn(ci)
+    return new Vector3(col[0], col[1], col[2])
+  })
+}
+function slerpVec(x:Vector3, w:number, y:Vector3):Vector3 {
+  let nx = x.clone();
+  nx.normalize();
+  let ny = y.clone();
+  ny.normalize();
+  let q = new Quaternion();
+  q.setFromUnitVectors(nx,ny);
+  let p = new Quaternion(0,0,0,1);
+  let r = p.slerp(q,w);
+  let mag = x.length()*(1-w) + y.length()*w;
+  return nx.applyQuaternion(r).setLength(mag);
 }
