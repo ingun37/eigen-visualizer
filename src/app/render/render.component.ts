@@ -39,9 +39,9 @@ export class RenderComponent implements OnInit {
 
     let controls = new OrbitControls(this.camera, this.renderer.domElement)
     controls.addEventListener( 'change', this.render.bind(this) ); // call this only in static scenes (i.e., if there is no animation loop)
-    this.scene.add(makeGrid())
+    // this.scene.add(makeGrid())
 
-    this.scene.add(makeAxis(0, 100, 0, 0x999999));
+    // this.scene.add(makeAxis(0, 100, 0, 0x999999));
 
     this.store.pipe(select(selectModels)).subscribe(models => {
       this.removeObjectsWithName("model")
@@ -59,21 +59,3 @@ export class RenderComponent implements OnInit {
   }
 }
 
-function makeAxis(x: number, y: number, z: number, color: number): THREE.Object3D {
-  var material = new THREE.LineBasicMaterial({ color: color, linewidth: 1 });
-  var points = [];
-  points.push(new THREE.Vector3(0, 0, 0));
-  points.push(new THREE.Vector3(x, y, z));
-  var geometry = new THREE.BufferGeometry().setFromPoints(points);
-  var line = new THREE.Line(geometry, material);
-  return line
-}
-
-function makeGrid(): THREE.Object3D {
-  var size = 5;
-  var divisions = 5;
-
-  var gridHelper = new THREE.GridHelper(size, divisions).translateX(2.5).translateZ(2.5);
-  gridHelper.renderOrder = -999
-  return gridHelper
-}

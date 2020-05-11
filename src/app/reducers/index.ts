@@ -163,8 +163,14 @@ export const selectEigenVectorModels = createSelector(selectEigenVectors, (eVecs
   return eVecs.map((v,i)=>MakeObject.vector(v, [0x00ffff, 0xff00ff, 0xffff00][i]))
 })
 
-export const selectModels = createSelector(selectShapeModel, selectEigenVectorModels, (tm, em)=>{
-  return em.concat([tm])
+const selectBasisModel = createSelector(selectDecompose, (decom)=>{
+  let ax = MakeObject.axis(0, 100, 0, 0x999999);
+  let grid = MakeObject.grid();
+  return [ax, grid]
+})
+
+export const selectModels = createSelector(selectShapeModel, selectEigenVectorModels, selectBasisModel, (tm, em, basis)=>{
+  return em.concat([tm]).concat(basis);
 })
 
 

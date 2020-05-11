@@ -1,4 +1,4 @@
-import { Matrix4, Matrix3, Object3D, DoubleSide, Vector3, Quaternion, BoxGeometry, MeshBasicMaterial, Mesh, LineBasicMaterial, Geometry, LineSegments, Group, SphereGeometry, Color, PointsMaterial, VertexColors, Points, ConeGeometry, BufferGeometry, Line, ShaderMaterial } from 'three';
+import { Matrix4, Matrix3, Object3D, DoubleSide, Vector3, Quaternion, BoxGeometry, MeshBasicMaterial, Mesh, LineBasicMaterial, Geometry, LineSegments, Group, SphereGeometry, Color, PointsMaterial, VertexColors, Points, ConeGeometry, BufferGeometry, Line, ShaderMaterial, GridHelper } from 'three';
 
 export class MakeObject {
 
@@ -119,4 +119,24 @@ static cube(): THREE.Object3D {
     group.add(sphere, frameObj)
     return group
   }
+
+  static axis(x: number, y: number, z: number, color: number): THREE.Object3D {
+    var material = new LineBasicMaterial({ color: color, linewidth: 1 });
+    var points = [];
+    points.push(new Vector3(0, 0, 0));
+    points.push(new Vector3(x, y, z));
+    var geometry = new BufferGeometry().setFromPoints(points);
+    var line = new Line(geometry, material);
+    return line
+  }
+  
+  static grid(): Object3D {
+    var size = 5;
+    var divisions = 5;
+  
+    var gridHelper = new GridHelper(size, divisions).translateX(2.5).translateZ(2.5);
+    gridHelper.renderOrder = -999
+    return gridHelper
+  }
+  
 }
