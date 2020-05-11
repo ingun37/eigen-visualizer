@@ -13,6 +13,7 @@ import { environment } from '../../environments/environment';
 import { Matrix4, Matrix3, Object3D, DoubleSide, Vector3, Quaternion } from 'three';
 import * as THREE from 'three';
 import Matrix, { EigenvalueDecomposition, determinant, inverse } from 'ml-matrix'
+import { MakeObject } from '../make-object';
 
 export class State {
   matrix: MatrixState
@@ -142,11 +143,11 @@ export const selectEigenVectors = createSelector(selectEigen, (eigen)=>{
 export const selectShapeModel = createSelector(selectThreeMatrix, selectShape, selectEigenVectors, (mat, sh, eVecs)=>{
   let o:THREE.Object3D
   if (sh == Shape.Cube) {
-    o = makeCube()
+    o = MakeObject.cube()
   } else if (sh == Shape.Urchin) {
-    o = makeUrchin(eVecs)
+    o = MakeObject.urchin(eVecs)
   } else {
-    o = makeSphere(eVecs)
+    o = MakeObject.sphere(eVecs)
   }
   o.matrix = mat
   o.matrixAutoUpdate = false
@@ -159,130 +160,13 @@ export const selectShapeModel = createSelector(selectThreeMatrix, selectShape, s
 })
 
 export const selectEigenVectorModels = createSelector(selectEigenVectors, (eVecs)=>{
-  return eVecs.map((v,i)=>makeVector(v, [0x00ffff, 0xff00ff, 0xffff00][i]))
+  return eVecs.map((v,i)=>MakeObject.vector(v, [0x00ffff, 0xff00ff, 0xffff00][i]))
 })
 
 export const selectModels = createSelector(selectShapeModel, selectEigenVectorModels, (tm, em)=>{
   return em.concat([tm])
 })
 
-function makeCube(): THREE.Object3D {
-
-  var geometry = new THREE.BoxGeometry().translate(0.5, 0.5, 0.5);
-  var material = new THREE.MeshBasicMaterial({
-    color: 0x70a0d0,
-    transparent: true,
-    opacity: 0.5
-  });
-  var cube = new THREE.Mesh(geometry, material);
-
-  var frameMat = new THREE.LineBasicMaterial({ color: 0x112233, linewidth: 3 });
-  let geo = new THREE.Geometry()
-  geo.vertices = [[0, 1, 0], [1, 1, 0], [1, 1, 0], [1, 1, 1], [1, 1, 1], [0, 1, 1], [0, 1, 1], [0, 1, 0],
-  [0, 0, 0], [1, 0, 0], [1, 0, 0], [1, 0, 1], [1, 0, 1], [0, 0, 1], [0, 0, 1], [0, 0, 0],
-  [0, 0, 0], [0, 1, 0], [1, 0, 0], [1, 1, 0], [1, 0, 1], [1, 1, 1], [0, 0, 1], [0, 1, 1]].map(x => new THREE.Vector3(x[0], x[1], x[2]))
-  let lines = new THREE.LineSegments(geo, frameMat)
-  lines.renderOrder = 999
-
-  let group = new THREE.Group()
-  group.add(cube, lines)
-  return group
-}
-
-function makeUrchin(eVecs:THREE.Vector3[]): THREE.Object3D {
-  let norms = [0,1,2].map(i=>{
-    if (i < eVecs.length) {
-      return eVecs[i].normalize()
-    } else {
-      return new THREE.Vector3(0,0,0)
-    }
-  })
-  var geometry = new THREE.SphereGeometry(1,30,28)
-  geometry.colors = geometry.vertices.map(v=>{
-    let rgb = norms.map(x=> Math.pow(Math.abs( x.dot(v.normalize())), 20) ).map(x=>0 * x + 0.95 * (1-x))
-    return new THREE.Color(rgb[0], rgb[1], rgb[2])
-  })
-  var material = new THREE.PointsMaterial({
-    vertexColors: THREE.VertexColors,
-    size: 0.1
-  })
-  let sphere = new THREE.Points(geometry, material)
-  return sphere
-}
-
-function makeVector(v:THREE.Vector3, color: number): THREE.Object3D {
-
-  let coneGeo = new THREE.ConeGeometry(0.15, 0.3)
-  let coneMat = new THREE.MeshBasicMaterial({ color: color })
-  let cone = new THREE.Mesh(coneGeo, coneMat).translateY(2)
-
-  var linemat = new THREE.LineBasicMaterial({ color: color, linewidth: 3.5 });
-  var lineGeometry = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(0, 0, 0), new THREE.Vector3(0, 2, 0)]);
-  var line = new THREE.Line(lineGeometry, linemat);
-
-  let group = new THREE.Group()
-  group.add(cone, line)
-  let q = new THREE.Quaternion()
-  q.setFromUnitVectors(new THREE.Vector3(0, 1, 0), v.normalize())
-  group.setRotationFromQuaternion(q)
-  group.renderOrder = 500
-  return group
-}
-
-function makeSphere(eVecs:THREE.Vector3[]): THREE.Object3D {
-  let norms = [0,1,2].map(i=>{
-    if (i<eVecs.length) {
-      return eVecs[i].normalize()
-    } else {
-      return new THREE.Vector3(0,0,0)
-    }
-  })
-  var geometry = new THREE.SphereGeometry(1,10,10)
-  let uniforms = {
-    "eigen1": { value: norms[0] },
-    "eigen2": { value: norms[1] },
-    "eigen3": { value: norms[2] },
-  };
-  var material = new THREE.ShaderMaterial({
-    transparent: true,
-    uniforms: uniforms,
-    vertexShader: `
-    varying vec3 vNormal;
-    void main() {
-        vNormal = normal;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4( position, 1.0 );
-    }
-    `,
-    fragmentShader: `
-    uniform vec3 eigen1;
-    uniform vec3 eigen2;
-    uniform vec3 eigen3;
-    varying vec3 vNormal;
-    float compute(vec3 eigen) {
-      float w = pow(abs(dot(vNormal, eigen)), 10.0);
-      return 0.0*w + 0.95*(1.0-w);
-    }
-    void main() {
-        float r = compute(eigen1);
-        float g = compute(eigen2);
-        float b = compute(eigen3);
-        gl_FragColor = vec4(r,g,b,1.0 - (r*g*b));
-    }
-    `
-  })
-  //let rgb = norms.map(x=> Math.pow(Math.abs( x.dot(v.normalize())), 20) ).map(x=>0 * x + 0.95 * (1-x))
-  let sphere = new THREE.Mesh(geometry, material)
-  let frameMat = new THREE.LineBasicMaterial({
-    opacity: 0.2,
-    color: 0x000000, 
-    // linewidth: 3,
-    transparent: true
-  });
-  let frameObj = new THREE.LineSegments(geometry, frameMat)
-  let group = new THREE.Group()
-  group.add(sphere, frameObj)
-  return group
-}
 
 function convertMat(p:Matrix):Matrix3 {
   let P = new Matrix3()
