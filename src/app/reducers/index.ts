@@ -10,10 +10,11 @@ import {
   on
 } from '@ngrx/store';
 import { environment } from '../../environments/environment';
-import { Matrix4, Matrix3, Object3D, DoubleSide, Vector3, Quaternion } from 'three';
+import { Matrix4, Matrix3, Object3D, DoubleSide, Vector3, Quaternion, Group } from 'three';
 import * as THREE from 'three';
 import Matrix, { EigenvalueDecomposition, determinant, inverse } from 'ml-matrix'
 import { MakeObject } from '../make-object';
+import * as _ from 'lodash'
 
 export class State {
   matrix: MatrixState
@@ -140,7 +141,18 @@ export const selectEigenVectors = createSelector(selectEigen, (eigen)=>{
     .map(c=>new THREE.Vector3(c[0],c[1],c[2]))
 })
 
-export const selectShapeModel = createSelector(selectThreeMatrix, selectShape, selectEigenVectors, (mat, sh, eVecs)=>{
+export const selectShapeModel = createSelector(selectInterpolation, selectShape, selectMatrix, selectEigenVectors, (w, sh, rawMat, eVecs)=>{
+  let ijk = [new Vector3(1,0,0),new Vector3(0,1,0),new Vector3(0,0,1),];
+  let mat = new Matrix4();
+  let [stage, stageW] = interpStageOf(w)
+  if (stage == InterpStage.Pinv) {
+    
+  } else if (stage == InterpStage.D) {
+    mat = conv33toM4(interpMat(Matrix.eye(3), stageW, new Matrix(rawMat.m33)));
+  } else if (stage == InterpStage.P) {
+    mat = conv33toM4(new Matrix(rawMat.m33));
+  }
+
   let o:THREE.Object3D
   if (sh == Shape.Cube) {
     o = MakeObject.cube()
@@ -163,10 +175,45 @@ export const selectEigenVectorModels = createSelector(selectEigenVectors, (eVecs
   return eVecs.map((v,i)=>MakeObject.vector(v, [0x00ffff, 0xff00ff, 0xffff00][i]))
 })
 
-const selectBasisModel = createSelector(selectDecompose, (decom)=>{
+const selectBasisModel = createSelector(selectEigenVectors, selectInterpolation, (eVecs, w)=>{
+  let ijk = [new Vector3(1,0,0),new Vector3(0,1,0),new Vector3(0,0,1),];
+  let mat = new Matrix4();
+
+  let [stage, stageW] = interpStageOf(w)
+  if (stage == InterpStage.Pinv) {
+    let cols = _.zip(ijk, eVecs).map(([i,e])=>slerpVec(i,stageW,e));
+    // console.log(ijk[0], cols[0], eVecs[0]);
+    mat.set(cols[0].x,cols[1].x,cols[2].x,0,
+            cols[0].y,cols[1].y,cols[2].y,0,
+            cols[0].z,cols[1].z,cols[2].z,0,
+            0,0,0,1);
+  } else if (stage == InterpStage.D) {
+    // console.log(ijk[0], cols[0], eVecs[0]);
+    mat.set(eVecs[0].x,eVecs[1].x,eVecs[2].x,0,
+            eVecs[0].y,eVecs[1].y,eVecs[2].y,0,
+            eVecs[0].z,eVecs[1].z,eVecs[2].z,0,
+            0,0,0,1);
+  } else if (stage == InterpStage.P) {
+    let cols = _.zip(eVecs, ijk).map(([i,e])=>slerpVec(i,stageW,e));
+    // console.log(ijk[0], cols[0], eVecs[0]);
+    mat.set(cols[0].x,cols[1].x,cols[2].x,0,
+            cols[0].y,cols[1].y,cols[2].y,0,
+            cols[0].z,cols[1].z,cols[2].z,0,
+            0,0,0,1);
+  }
+
+  
+
   let ax = MakeObject.axis(0, 100, 0, 0x999999);
   let grid = MakeObject.grid();
-  return [ax, grid]
+  let grp = new Group();
+  
+  
+  grp.add(ax, grid);
+  grp.matrix = mat;
+  grp.matrixAutoUpdate = false;
+  grp.updateMatrixWorld(true);
+  return [grp];
 })
 
 export const selectModels = createSelector(selectShapeModel, selectEigenVectorModels, selectBasisModel, (tm, em, basis)=>{
@@ -179,6 +226,15 @@ function convertMat(p:Matrix):Matrix3 {
   P.set(p.getRow(0)[0], p.getRow(0)[1], p.getRow(0)[2],
         p.getRow(1)[0], p.getRow(1)[1], p.getRow(1)[2],
         p.getRow(2)[0], p.getRow(2)[1], p.getRow(2)[2])
+  return P
+}
+
+function conv33toM4(p:Matrix):Matrix4 {
+  let P = new Matrix4()
+  P.set(p.getRow(0)[0], p.getRow(0)[1], p.getRow(0)[2],0,
+        p.getRow(1)[0], p.getRow(1)[1], p.getRow(1)[2],0,
+        p.getRow(2)[0], p.getRow(2)[1], p.getRow(2)[2],0,
+        0,0,0,1);
   return P
 }
 
@@ -211,14 +267,14 @@ function columnsM(x:Matrix):Vector3[] {
   })
 }
 function slerpVec(x:Vector3, w:number, y:Vector3):Vector3 {
-  let nx = x.clone();
-  nx.normalize();
-  let ny = y.clone();
-  ny.normalize();
-  let q = new Quaternion();
-  q.setFromUnitVectors(nx,ny);
-  let p = new Quaternion(0,0,0,1);
-  let r = p.slerp(q,w);
+  let nx = x.clone().normalize();
+  let ny = y.clone().normalize();
+  let qa = new Quaternion();
+  qa.setFromUnitVectors(nx,nx);
+  let qb = new Quaternion();
+  qb.setFromUnitVectors(nx,ny)
+  let q = qa.slerp(qb, w);
+
   let mag = x.length()*(1-w) + y.length()*w;
-  return nx.applyQuaternion(r).setLength(mag);
+  return nx.applyQuaternion(q).setLength(mag);
 }

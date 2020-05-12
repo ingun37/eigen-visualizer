@@ -59,7 +59,7 @@ static cube(): THREE.Object3D {
     let group = new Group()
     group.add(cone, line)
     let q = new Quaternion()
-    q.setFromUnitVectors(new Vector3(0, 1, 0), v.normalize())
+    q.setFromUnitVectors(new Vector3(0, 1, 0), v.clone().normalize())
     group.setRotationFromQuaternion(q)
     group.renderOrder = 500
     return group
