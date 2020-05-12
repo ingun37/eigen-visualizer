@@ -65,7 +65,9 @@ export const selectMatrix = (state: State) => state.matrix
 export const selectInterpolation = (state: State) => state.interpolation
 
 export const selectEigen = createSelector(selectMatrix, (matrixState) => {
-  return new EigenvalueDecomposition(matrixState.m33)
+  let de = new EigenvalueDecomposition(matrixState.m33);
+
+  return de;
 })
 
 export const selectDecompose = createSelector(selectEigen, (eigen)=>{
@@ -85,47 +87,6 @@ const interpStageOf = (weight:number):[InterpStage, number]=>{
     return [InterpStage.P, weight/0.333 - 2]
   }
 }
-export const selectInterpPinv = createSelector(selectInterpolation, selectDecompose, (weight, decom)=>{
-  let [stage, stageW] = interpStageOf(weight)
-  if (stage == InterpStage.Pinv) {
-    return (slerpMat(Matrix.eye(3,3), stageW, (decom.iP)))
-  } else {
-    return decom.iP
-  }
-})
-export const selectInterpD = createSelector(selectInterpolation, selectDecompose, (weight, decom)=>{
-  let [stage, stageW] = interpStageOf(weight)
-  if (stage == InterpStage.D) {
-    return (interpMat(Matrix.eye(3,3), stageW, (decom.D)))
-  } else if (stage == InterpStage.P) {
-    return decom.D
-  } else {
-    return (Matrix.eye(3,3))
-  }
-})
-export const selectInterpP = createSelector(selectInterpolation, selectDecompose, (weight, decom)=>{
-  let [stage, stageW] = interpStageOf(weight)
-  if (stage == InterpStage.P) {
-    return (slerpMat(Matrix.eye(3,3), stageW, (decom.P)))
-  } else {
-    return (Matrix.eye(3,3))
-  }
-})
-
-
-export const selectThreeMatrix = createSelector(selectInterpP, selectInterpD, selectInterpPinv, (P,D,Pi) => {
-  
-  let z = P.mmul(D).mmul(Pi)
-  
-  let m3 = [0,1,2].map(i=>z.getRow(i))
-  let m4 = new Matrix4()
-  m4.set(
-    m3[0][0], m3[0][1], m3[0][2], 0,
-    m3[1][0], m3[1][1], m3[1][2], 0,
-    m3[2][0], m3[2][1], m3[2][2], 0,
-    0, 0, 0, 1)
-  return m4
-})
 
 export const selectDeterminant = createSelector(selectMatrix, (matrixState) => {
   return determinant(matrixState.m33)
@@ -135,14 +96,20 @@ export const selectShape = (state: State) => state.shape
 
 
 export const selectEigenVectors = createSelector(selectEigen, (eigen)=>{
-  return [0,1,2]
-    .filter(x=>eigen.imaginaryEigenvalues[x] == 0 && Math.abs(eigen.realEigenvalues[x]) > 0.000001)
-    .map(i=>eigen.eigenvectorMatrix.getColumn(i))
-    .map(c=>new THREE.Vector3(c[0],c[1],c[2]))
+  return [0,1,2].map(idx => {
+    if (eigen.imaginaryEigenvalues[idx] != 0) {
+      throw `not diagonalizable: real roots for characteristic equation does not exist.`;
+    }
+    if (Math.abs(eigen.realEigenvalues[idx]) < 0.001) {
+      return new Vector3(0,0,0);
+    } else {
+      let col = eigen.eigenvectorMatrix.getColumn(idx);
+      return new Vector3(col[0],col[1],col[2],);
+    }
+  })
 })
 
 export const selectShapeModel = createSelector(selectInterpolation, selectShape, selectMatrix, selectEigenVectors, (w, sh, rawMat, eVecs)=>{
-  let ijk = [new Vector3(1,0,0),new Vector3(0,1,0),new Vector3(0,0,1),];
   let mat = new Matrix4();
   let [stage, stageW] = interpStageOf(w)
   if (stage == InterpStage.Pinv) {
@@ -172,13 +139,13 @@ export const selectShapeModel = createSelector(selectInterpolation, selectShape,
 })
 
 export const selectEigenVectorModels = createSelector(selectEigenVectors, (eVecs)=>{
-  return eVecs.map((v,i)=>MakeObject.vector(v, [0x00ffff, 0xff00ff, 0xffff00][i]))
+  return eVecs.filter(v => v.length() > 0.001) .map((v,i)=>MakeObject.vector(v, [0x00ffff, 0xff00ff, 0xffff00][i]))
 })
 
 const selectBasisModel = createSelector(selectEigenVectors, selectInterpolation, (eVecs, w)=>{
   let ijk = [new Vector3(1,0,0),new Vector3(0,1,0),new Vector3(0,0,1),];
   let mat = new Matrix4();
-
+  
   let [stage, stageW] = interpStageOf(w)
   if (stage == InterpStage.Pinv) {
     let cols = _.zip(ijk, eVecs).map(([i,e])=>slerpVec(i,stageW,e));
@@ -194,7 +161,10 @@ const selectBasisModel = createSelector(selectEigenVectors, selectInterpolation,
             eVecs[0].z,eVecs[1].z,eVecs[2].z,0,
             0,0,0,1);
   } else if (stage == InterpStage.P) {
-    let cols = _.zip(eVecs, ijk).map(([i,e])=>slerpVec(i,stageW,e));
+    let cols = _.zip(ijk, eVecs).map(([i,e])=> {
+        return slerpVec(e,stageW,i);
+    });
+
     // console.log(ijk[0], cols[0], eVecs[0]);
     mat.set(cols[0].x,cols[1].x,cols[2].x,0,
             cols[0].y,cols[1].y,cols[2].y,0,
@@ -278,3 +248,44 @@ function slerpVec(x:Vector3, w:number, y:Vector3):Vector3 {
   let mag = x.length()*(1-w) + y.length()*w;
   return nx.applyQuaternion(q).setLength(mag);
 }
+
+export const selectInterpPinv = createSelector(selectInterpolation, selectDecompose, (weight, decom)=>{
+  let [stage, stageW] = interpStageOf(weight)
+  if (stage == InterpStage.Pinv) {
+    return (slerpMat(Matrix.eye(3,3), stageW, (decom.iP)))
+  } else {
+    return decom.iP
+  }
+})
+export const selectInterpD = createSelector(selectInterpolation, selectDecompose, (weight, decom)=>{
+  let [stage, stageW] = interpStageOf(weight)
+  if (stage == InterpStage.D) {
+    return (interpMat(Matrix.eye(3,3), stageW, (decom.D)))
+  } else if (stage == InterpStage.P) {
+    return decom.D
+  } else {
+    return (Matrix.eye(3,3))
+  }
+})
+export const selectInterpP = createSelector(selectInterpolation, selectDecompose, (weight, decom)=>{
+  let [stage, stageW] = interpStageOf(weight)
+  if (stage == InterpStage.P) {
+    return (slerpMat(Matrix.eye(3,3), stageW, (decom.P)))
+  } else {
+    return (Matrix.eye(3,3))
+  }
+})
+
+export const selectThreeMatrix = createSelector(selectInterpP, selectInterpD, selectInterpPinv, (P,D,Pi) => {
+  
+  let z = P.mmul(D).mmul(Pi)
+  
+  let m3 = [0,1,2].map(i=>z.getRow(i))
+  let m4 = new Matrix4()
+  m4.set(
+    m3[0][0], m3[0][1], m3[0][2], 0,
+    m3[1][0], m3[1][1], m3[1][2], 0,
+    m3[2][0], m3[2][1], m3[2][2], 0,
+    0, 0, 0, 1)
+  return m4
+})

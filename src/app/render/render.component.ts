@@ -48,6 +48,8 @@ export class RenderComponent implements OnInit {
       models.forEach(x=>{x.name = "model"})
       this.scene.add(...models)
       this.render()
+    }, err => {
+      console.log(err);
     })
   }
   removeObjectsWithName(name: string) {
