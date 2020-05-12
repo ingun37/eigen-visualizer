@@ -139,7 +139,7 @@ export const selectShapeModel = createSelector(selectInterpolation, selectShape,
 })
 
 export const selectEigenVectorModels = createSelector(selectEigenVectors, (eVecs)=>{
-  return eVecs.filter(v => v.length() > 0.001) .map((v,i)=>MakeObject.vector(v, [0x00ffff, 0xff00ff, 0xffff00][i]))
+  return eVecs.filter(v => v.lengthSq() > 0.001) .map((v,i)=>MakeObject.vector(v, [0x00ffff, 0xff00ff, 0xffff00][i]))
 })
 
 const selectBasisModel = createSelector(selectEigenVectors, selectInterpolation, (eVecs, w)=>{
@@ -237,6 +237,11 @@ function columnsM(x:Matrix):Vector3[] {
   })
 }
 function slerpVec(x:Vector3, w:number, y:Vector3):Vector3 {
+  if (x.lengthSq() < 0.001) {
+    x = y;
+  } else if (y.lengthSq() < 0.001) {
+    y = x;
+  }
   let nx = x.clone().normalize();
   let ny = y.clone().normalize();
   let qa = new Quaternion();
