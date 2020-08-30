@@ -28,8 +28,15 @@ export class RenderComponent implements OnInit {
   }
   ngOnInit(): void {
     this.scene.background = new THREE.Color(1, 1, 1)
-    let aa = Math.floor( Math.min(window.innerWidth, window.innerHeight) * 0.8)
-    this.renderer.setSize(aa, aa);
+
+    const onResize = ()=>{
+      this.camera.aspect = window.innerWidth / window.innerHeight;
+      this.camera.updateProjectionMatrix()
+      this.renderer.setSize(window.innerWidth, window.innerHeight)
+    };
+    onResize();
+    window.onresize = onResize
+
     this.ref.nativeElement.appendChild(this.renderer.domElement);
 		
     this.camera.position.z = 5;
@@ -51,7 +58,10 @@ export class RenderComponent implements OnInit {
     }, err => {
       console.log(err);
     })
+
+    
   }
+  
   removeObjectsWithName(name: string) {
     let o = this.scene.getObjectByName(name)
     if (o) {
@@ -60,4 +70,3 @@ export class RenderComponent implements OnInit {
     }
   }
 }
-
